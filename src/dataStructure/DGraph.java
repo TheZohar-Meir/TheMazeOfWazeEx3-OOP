@@ -2,6 +2,13 @@ package dataStructure;
 
 import java.util.HashMap;
 import java.util.Set;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import gui.GraphRefresher;
+import utils.Point3D;
+
 import java.io.Serializable;
 import java.util.Collection;
 
@@ -24,7 +31,7 @@ public class DGraph implements graph,Serializable{
 
 	public HashMap <Integer,node_data> NodeMap;
 	public HashMap <node_data, HashMap<Integer, edge_data>> EdgeMap;
-
+	private GraphRefresher listener;
 	/**
 	 * Deaffult constructor sets all values to zeros and null.
 	 */
@@ -164,7 +171,37 @@ public class DGraph implements graph,Serializable{
 		}
 		return null;
 	}
-
+public void init(String file) {
+		
+		try
+		{
+			JSONObject objects = new JSONObject(file);
+			JSONArray Edges = objects.getJSONArray("Edges");
+			JSONArray Nodes = objects.getJSONArray("Nodes");
+			
+			for(int i = 0; i < Nodes.length(); i++)
+			{
+				String pos = Nodes.getJSONObject(i).getString("pos");
+				String str[] = pos.split(",");
+				int id = Nodes.getJSONObject(i).getInt("id");
+				Point3D p = new Point3D(Double.parseDouble(str[0]),Double.parseDouble(str[1]),0.0);
+				node_data n = new Node(id,0.0,p); 
+				this.addNode(n);
+			} 
+			
+			for(int i = 0; i < Edges.length(); i++)
+			{
+				int src = Edges.getJSONObject(i).getInt("src");
+				int dst = Edges.getJSONObject(i).getInt("dest");
+				double w = Edges.getJSONObject(i).getDouble("w");
+				this.connect(src, dst, w);
+			} 
+		}
+		catch(Exception ex)
+		{
+			System.out.println(ex.toString());
+		}
+	}
 	
 	/**
 	 * removing the edge between the two given nodes.
@@ -208,6 +245,16 @@ public class DGraph implements graph,Serializable{
 	 */
 	public int getMC() {
 		return this.MC;
+	}
+	
+	
+	public void addListener(GraphRefresher listener) {
+		this.listener = listener;
+	}
+	
+	public void updateListener() {
+		if(listener!= null)
+			listener.graphUpdate();
 	}
 
 }
