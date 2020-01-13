@@ -1,5 +1,7 @@
 package dataStructure;
 
+import java.awt.image.BufferedImage;
+
 import utils.Point3D;
 
 public class Robot {
@@ -8,7 +10,7 @@ public class Robot {
 	private double speed;
 	private node_data node;
 	private edge_data edge;
-
+	private BufferedImage image;
 
 	public Robot(){
 		this.id = 0;
@@ -18,11 +20,10 @@ public class Robot {
 		this.node = null;
 	}
 	
-	public Robot(int id,Point3D pos,double speed,node_data node,edge_data edge){
+	public Robot(int id,Point3D pos,double speed,node_data node){
 		this.id = id;
 		this.pos = pos;
 		this.speed = speed;
-		this.edge = edge;
 		this.node = node;
 	}
 
@@ -65,5 +66,20 @@ public class Robot {
 	public void setEdge(edge_data edge) {
 		this.edge = edge;
 	}
+	
+	/**
+	 * @return the image
+	 */
+	public BufferedImage getImage() {
+		return image;
+	}
+
+	/**
+	 * @param image the image to set
+	 */
+	public void setImage(BufferedImage image) {
+		this.image = image;
+	}
+	
 //init (?)
 }

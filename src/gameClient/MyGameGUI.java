@@ -13,12 +13,20 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import org.json.JSONException;
+import org.json.JSONObject;
 import dataStructure.DGraph;
 import dataStructure.edge_data;
 import dataStructure.graph;
@@ -28,7 +36,7 @@ import dataStructure.Robot;
 import gui.GraphRefresher;
 import Server.Game_Server;
 import Server.game_service; 
- 
+
 
 public class MyGameGUI extends JFrame implements ActionListener , Serializable,  GraphRefresher, MouseListener, MouseMotionListener{
 
@@ -36,22 +44,25 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	private final double EPSILON = 0.00001;
 	private ArrayList<Fruit> FruitsList = new ArrayList<Fruit>();
 	private ArrayList<Robot> RobotsList = new ArrayList<Robot>();
+	ImageIcon RobotIMG = new ImageIcon("/gameClient/RobotImage.jpg");
+	ImageIcon FruitIMG = new ImageIcon();
 	private DGraph DG = new DGraph();
 	private graph GG;
-	//private Graph_Algo GA = new Graph_Algo();
-	private double min_x = Integer.MAX_VALUE;
-	private double max_x = Integer.MIN_VALUE;
-	private double min_y = Integer.MAX_VALUE;
-	private double max_y = Integer.MIN_VALUE;
-	
+	private static double min_x = 35.18725458757062;
+	private static double max_x = 35.21315127845036;
+	private static double min_y = 32.09920263529412;
+	private static double max_y = 32.10943409579832;
+	private final int fram = 700;
+	BufferedImage myImage;
 
+	
 	public MyGameGUI() {
-		//int scenario_num = 2;
-		//game_service game = Game_Server.getServer(scenario_num); // you have [0,23] games
-		//	String g = game.getGraph();
-		//DG.init(g);
-		
+		int scenario_num = 0;
+		game_service game = Game_Server.getServer(scenario_num); // you have [0,23] games
+		String g = game.getGraph();
+		DG.init(g);
 		initGUI(DG);
+		this.addMouseListener(this);
 		
 	}
 
@@ -66,12 +77,11 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	 * @param DGraph
 	 */
 	private void initGUI(DGraph DGraph){
-		
-
-		this.setSize(800, 800);
+		 
+		this.setSize(fram, fram);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		//this.setResizable(false);
 		this.setVisible(true);
-		
 		
 		MenuBar menuBar = new MenuBar();
 		Menu menu = new Menu("Menu");
@@ -89,13 +99,10 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		MenuItem item4 = new MenuItem("New Auto Game");
 		item4.addActionListener(this);
 		menu.add(item4);
+		
 		if(DGraph != null) FindMinMax(DGraph);
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
-//		ImageIcon image = new ImageIcon ("data/AA.png"); // Creates the image
-//		JLabel label = new JLabel (image); // add the image to the label
-//		this.add(label); //add the label to the frame
-		//System.out.println(new File("A3.png").exists());
 	}
 
 	
@@ -106,7 +113,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		
 		super.paint(g);
 
-		Image img = Toolkit.getDefaultToolkit().getImage(MyGameGUI.class.getResource("/gameClient/AA.png"));  
+		Image img = Toolkit.getDefaultToolkit().getImage(MyGameGUI.class.getResource("/gameClient/game.png"));  
 		g.drawImage(img, 0, 0, this.getWidth(), this.getHeight(), this);  
 				                  
 		if(this.DG != null) {
@@ -114,12 +121,13 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 			for(node_data node_data: Vertexes) {
 
 				Point3D TempPoint = node_data.getLocation();
-				g.setColor(Color.RED);
+				g.setColor(Color.RED); 
 				int x0 = (int) scale(TempPoint.x(), min_x, max_x , 50 , this.getHeight()-50);
-				int y0 = (int) scale(TempPoint.y(), min_y, max_y , 70 , this.getWidth()-70);
-				g.fillOval(x0, y0, 10, 10);	
-				// Check here the +1 -2 brother it may affect the string cuz we already transformed to cordinates
-				g.drawString(Integer.toString(node_data.getKey()), x0+1, y0-2);
+				int y0 = (int) scale(TempPoint.y() ,max_y, min_y, 70 , this.getWidth()-70);	
+//				int x0 = (int) scale(TempPoint.x(), min_x, max_x , 10, this.getHeight()-10);
+//				int y0 = (int) scale(TempPoint.y() ,max_y, min_y, 15 , this.getWidth()-25);	
+				g.fillOval(x0-6, y0-4, 10, 10);	
+				g.drawString(Integer.toString(node_data.getKey()), x0-6, y0+20);
 				Collection<edge_data> Edge = DG.getE(node_data.getKey());
 
 				for(edge_data edge_data: Edge) {	
@@ -128,15 +136,15 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 					node_data dest = DG.getNode(edge_data.getDest());
 					Point3D TempPoint2 = dest.getLocation();
 					int x1 = (int) scale(TempPoint2.x(), min_x, max_x , 50 , this.getWidth()-50);
-					int y1 = (int) scale(TempPoint2.y(), min_y, max_y , 70 , this.getHeight()-70);
+					int y1 = (int) scale(TempPoint2.y(),max_y, min_y , 70 , this.getHeight()-70);
+
 					if (TempPoint2 != null) {
 						g.drawLine(x0, y0, x1, y1);
-						// line below this should contain lidor's formulas
-						g.drawString(Double.toString(edge_data.getWeight()),((x0+x1)/2) , ((y0+y1)/2));
+						g.drawString(Double.toString(edge_data.getWeight()),((((x0+x1)/2)+x1)/2) , ((((y0+y1)/2)+y1)/2));
 						g.setColor(Color.GREEN);
 						int XFrame =((((((x0+x1)/2)+x1)/2)+x1)/2);
 						int YFrame = ((((((y0+y1)/2)+y1)/2)+y1)/2);
-						g.fillOval(XFrame, YFrame, 6, 6);	
+						g.fillOval(XFrame, YFrame, 7, 7);	
 					}
 				}
 			}
@@ -148,7 +156,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 					if(f.getType() == 1) g.setColor(Color.GREEN);
 					else g.setColor(Color.YELLOW);
 					int x = (int) scale(p.x(), min_x, max_x , 50, this.getWidth()-50);
-					int y = (int) scale(p.y(), min_y, max_y ,70 , this.getHeight()-70);
+					int y = (int) scale(p.y(), max_y, min_y ,70 , this.getHeight()-70);
 					g.fillOval(x, y, 8	, 8);
 				}
 			}
@@ -158,13 +166,27 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 					Point3D p = r.getPos();
 					g.setColor(Color.PINK);
 					int x = (int) scale(p.x(), min_x, max_x , 50 , this.getWidth()-50);
-					int y = (int) scale(p.y(), min_y, max_y , 70 , this.getHeight()-70);
-					g.fillOval(x, y, 3	, 3);			
+					int y = (int) scale(p.y(), max_y, min_y , 70 , this.getHeight()-70);
+					g.drawImage(RobotIMG.getImage(), x, y, null);			
 				}
 			}
 		}
 	}
 
+	
+//	
+//	public static double scaleX(double longitude, double latitude,double pyHeighty,double pxwidth){
+//		double x=  longitude - min_x;
+//		double x1 = (pxwidth*(x/(max_x-min_x)));
+//		return x1;
+//	}
+//	
+//	public static double scaleY(double longitude, double latitude,double pyHeighty,double pxwidth){
+//		double y = max_y-latitude;
+//		double y1 =  (pyHeighty*(y/(max_y-min_y)));
+//		return y1;
+//	}
+	
 	
 	
 	/**
@@ -196,7 +218,6 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 						if(edF!= null)f.setEdge(edF);
 					}
 				}
-
 			}
 		}
 	}
@@ -271,35 +292,163 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 			user_input = JOptionPane.showInputDialog(null,"Please Enter a value between 0-23 ");
 			scenario_num = Integer.parseInt(user_input) ;
 		}
+		
 		game_service game = Game_Server.getServer(scenario_num); // you have [0,23] games
-		System.out.println(game);
+		String gameInfo = game.toString();
 		String g = game.getGraph();
 		DGraph gg = new DGraph();
 		gg.init(g);
-		this.DG=gg;
+		this.DG = gg;
 		initGUI(this.DG);
+			try {
+				JSONObject line = new JSONObject(gameInfo);
+				JSONObject mygame = line.getJSONObject("GameServer");
+				int R_amount = mygame.getInt("robots");
+				//Iterator<String> f_iter = game.getFruits().iterator();
+				
+				
+				//while(f_iter.hasNext()) {System.out.println(f_iter.next());}	
+				int src_node = 0;
+				int RobotLocation=0;
+				//this.getContentPane().setLayout(new FlowLayout());
+				
+				//ImageIcon RobotIMG = createImageIcon("/gameClient/RobotImage.jpg","This Image represents the robot");
+			//	Image RobotIMG = Toolkit.getDefaultToolkit().getImage(MyGameGUI.class.getResource("/gameClient/RobotImage.jpg"));
+				
+				
+				//JPanel t = new JPanel();
+				
+				for(int a = 0;a<R_amount;a++) {
+					
+					String RobotInput = JOptionPane.showInputDialog(null, "Please enter the Node number to initilize robot's location ");
+					RobotLocation = Integer.parseInt(RobotInput);
+					JLabel RobotLable = new JLabel(RobotIMG );
+					
+					int RobotX = (int)scale(this.DG.NodeMap.get(RobotLocation).getLocation().ix(),min_x, max_x , 50 , this.getHeight()-50);
+					int RobotY = (int)scale(this.DG.NodeMap.get(RobotLocation).getLocation().iy(),max_y, min_y , 70 , this.getHeight()-70);
+//					RobotLable.setBounds(RobotX,RobotY, 50, 50);
+//					this.getContentPane().add(new JLabel(RobotIMG));
+//					t.add(RobotLable);
+					game.addRobot(RobotLocation);
+				}
+				
+				List<String> tempRobots = new ArrayList<String>(); 
+				tempRobots = game.getRobots();
+				
+				for(String s: tempRobots){
+					
+					System.out.println("s:"+s);
+					JSONObject line1 = new JSONObject(s);
+					
+					int id = line1.getInt("id");
+					double value = line1.getDouble("value");
+					int src = line1.getInt("src");
+					int dest = line1.getInt("dest");
+					double speed = line1.getDouble("speed");
+					
+					String pos = line1.getJSONObject(s).getString("pos");
+					String str[] = pos.split(",");
+					Point3D p = new Point3D(Double.parseDouble(str[0]),Double.parseDouble(str[1]),0.0);
+
+					Robot r = new Robot(id, p, speed,DG.NodeMap.get(src));
+					RobotsList.add(r);
+				}
+			}
+			catch (JSONException e) {e.printStackTrace();}
+			//game.startGame();
+			// should be a Thread!!!
+//			while(game.isRunning()) {
+//				moveRobots(game, gg);
+//			}
+			String results = game.toString();
+			System.out.println("Game Over: "+results);
+			repaint();
+		
+	}
+	
+	
+	/** Returns an ImageIcon, or null if the path was invalid. */
+	protected ImageIcon createImageIcon(String path, String description) {
+	    java.net.URL imgURL = getClass().getResource(path);
+	    if (imgURL != null) {
+	        return new ImageIcon(imgURL, description);
+	    } else {
+	        System.err.println("Couldn't find file: " + path);
+	        return null;
+	    }
 	}
 
+	/** 
+	 * Moves each of the robots along the edge, 
+	 * in case the robot is on a node the next destination (next edge) is chosen (randomly).
+	 * @param game
+	 * @param gg
+	 * @param log
+	 */
+	private static void moveRobots(game_service game, graph gg) {
+		List<String> log = game.move();
+		if(log!=null) {
+			long t = game.timeToEnd();
+			for(int i=0;i<log.size();i++) {
+				String robot_json = log.get(i);
+				try {
+					JSONObject line = new JSONObject(robot_json);
+					JSONObject ttt = line.getJSONObject("Robot");
+					int rid = ttt.getInt("id");
+					int src = ttt.getInt("src");
+					int dest = ttt.getInt("dest");
+				
+					if(dest==-1) {	
+						dest = nextNode(gg, src);
+						game.chooseNextEdge(rid, dest);
+						System.out.println("Turn to node: "+dest+"  time to end:"+(t/1000));
+						System.out.println(ttt);
+					}
+				} 
+				catch (JSONException e) {e.printStackTrace();}
+			}
+		}
+	}
+	/**
+	 * a very simple random walk implementation!
+	 * @param g
+	 * @param src
+	 * @return
+	 */
+	private static int nextNode(graph g, int src) {
+		int ans = -1;
+		Collection<edge_data> ee = g.getE(src);
+		Iterator<edge_data> itr = ee.iterator();
+		int s = ee.size();
+		int r = (int)(Math.random()*s);
+		int i=0;
+		while(i<r) {itr.next();i++;}
+		ans = itr.next().getDest();
+		return ans;
+	}
+	
+	
+	
 
 	/**
 	 * 
 	 * @param graph
 	 */
-	
-	
-	
-	
-	
 	private void FindMinMax (graph graph) {
 
 		Collection<node_data> GraphNodes = graph.getV();
 		for (node_data MyNode : GraphNodes) {
 			Point3D p = MyNode.getLocation();
-			if(p.x() < min_x)min_x = p.x();
+			if(p.x() < min_x) min_x = p.x();
 			if(p.x() > max_x)max_x = p.x();
 			if(p.y() > max_y)max_y = p.y();
 			if(p.y() < min_y)min_y = p.y();
 		}
+		
+//		System.out.println(min_x);
+//		System.out.println(max_x);
+//		System.out.println(max_y);
+//		System.out.println(min_y);
 	}
 
 	
@@ -384,6 +533,15 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		MyGameGUI Test =  new MyGameGUI();
 		Test.setVisible(true);
 
+	}
+	
+
+	public BufferedImage getMyImage() {
+		return myImage;
+	}
+
+	public void setMyImage(BufferedImage myImage) {
+		this.myImage = myImage;
 	}
 
 }

@@ -1,6 +1,8 @@
 package dataStructure;
 
 
+import java.awt.image.BufferedImage;
+
 import org.json.JSONObject;
 import utils.Point3D;
 public class Fruit {
@@ -9,6 +11,7 @@ public class Fruit {
 	private int type;
 	private Point3D pos;
 	private edge_data edge;
+	BufferedImage myImage;
 
 	public Fruit(){
 		this.value = 0;
@@ -78,7 +81,22 @@ public class Fruit {
 		}
 	}
 
-	
+
+	/**
+	 * get the image of the object
+	 * @return the myImage
+	 */
+	public BufferedImage getMyImage() {
+		return myImage;
+	}
+
+	/**
+	 * @param myImage - to set the image of the object
+	 */
+	public void setMyImage(BufferedImage myImage) {
+		this.myImage = myImage;
+	}
+
 
 	
 }
