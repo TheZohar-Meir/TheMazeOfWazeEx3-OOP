@@ -43,14 +43,16 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	private double max_x = Integer.MIN_VALUE;
 	private double min_y = Integer.MAX_VALUE;
 	private double max_y = Integer.MIN_VALUE;
-
+	
 
 	public MyGameGUI() {
-		int scenario_num = 2;
-		game_service game = Game_Server.getServer(scenario_num); // you have [0,23] games
-		String g = game.getGraph();
-		DG.init(g);
+		//int scenario_num = 2;
+		//game_service game = Game_Server.getServer(scenario_num); // you have [0,23] games
+		//	String g = game.getGraph();
+		//DG.init(g);
+		
 		initGUI(DG);
+		
 	}
 
 	public MyGameGUI(DGraph Dgraph) {
@@ -65,15 +67,12 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	 */
 	private void initGUI(DGraph DGraph){
 		
-//		ImageIcon image = new ImageIcon ("data/AA.png"); // Creates the image
-//		JLabel label = new JLabel (image); // add the image to the label
-//		this.add(label); //add the label to the frame
+
 		this.setSize(800, 800);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setVisible(true);
-		//System.out.println(new File("A3.png").exists());
 		
-		if(DGraph != null) {FindMinMax(DGraph);}
+		
 		MenuBar menuBar = new MenuBar();
 		Menu menu = new Menu("Menu");
 		menuBar.add(menu);
@@ -90,9 +89,13 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		MenuItem item4 = new MenuItem("New Auto Game");
 		item4.addActionListener(this);
 		menu.add(item4);
-
+		if(DGraph != null) FindMinMax(DGraph);
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
+//		ImageIcon image = new ImageIcon ("data/AA.png"); // Creates the image
+//		JLabel label = new JLabel (image); // add the image to the label
+//		this.add(label); //add the label to the frame
+		//System.out.println(new File("A3.png").exists());
 	}
 
 	
@@ -128,7 +131,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 					int y1 = (int) scale(TempPoint2.y(), min_y, max_y , 70 , this.getHeight()-70);
 					if (TempPoint2 != null) {
 						g.drawLine(x0, y0, x1, y1);
-
+						// line below this should contain lidor's formulas
 						g.drawString(Double.toString(edge_data.getWeight()),((x0+x1)/2) , ((y0+y1)/2));
 						g.setColor(Color.GREEN);
 						int XFrame =((((((x0+x1)/2)+x1)/2)+x1)/2);
@@ -282,6 +285,11 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	 * 
 	 * @param graph
 	 */
+	
+	
+	
+	
+	
 	private void FindMinMax (graph graph) {
 
 		Collection<node_data> GraphNodes = graph.getV();
@@ -304,8 +312,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	 * @param t_max the maximum of the range of your desired target scaling
 	 * @return
 	 */
-	private double scale(double data, double r_min, double r_max, 
-			double t_min, double t_max)
+	private double scale(double data, double r_min, double r_max,double t_min, double t_max)
 	{
 
 		double res = ((data - r_min) / (r_max-r_min)) * (t_max - t_min) + t_min;
