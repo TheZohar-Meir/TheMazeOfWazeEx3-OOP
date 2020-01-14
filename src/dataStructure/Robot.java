@@ -2,10 +2,13 @@ package dataStructure;
 
 import java.awt.image.BufferedImage;
 
+import org.json.JSONObject;
+
 import utils.Point3D;
 
 public class Robot {
 	private int id;
+	private int value;
 	private Point3D pos;
 	private double speed;
 	private node_data node;
@@ -80,6 +83,34 @@ public class Robot {
 	public void setImage(BufferedImage image) {
 		this.image = image;
 	}
+
+	public void RobotFromJSON(String json)
+	{
+		if(!json.isEmpty())
+		{
+			try
+			{
+				JSONObject obj = new JSONObject(json);
+				JSONObject CurrBot = (JSONObject) obj.get("Robot");
+				
+				String pos = CurrBot.getString("pos");
+				String[] arr = pos.split(",");
+				double x = Double.parseDouble(arr[0]);
+				double y = Double.parseDouble(arr[1]);
+				double z = Double.parseDouble(arr[2]);
+				this.pos = new Point3D(x, y, z);
+				int id = CurrBot.getInt("id");
+				this.id = id;
+				int value = CurrBot.getInt("value");
+				this.value = value;
+				int speed = CurrBot.getInt("speed");
+				this.speed = speed;
+				
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
 	
-//init (?)
 }

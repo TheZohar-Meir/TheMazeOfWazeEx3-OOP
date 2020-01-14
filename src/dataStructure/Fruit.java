@@ -60,6 +60,7 @@ public class Fruit {
 	}
 
 	public void initFruit(String g){
+		
 		if(!g.isEmpty()){
 			try{
 				JSONObject obj = new JSONObject(g);
@@ -80,6 +81,7 @@ public class Fruit {
 			}
 		}
 	}
+
 
 
 	/**
