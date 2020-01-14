@@ -12,6 +12,7 @@ public class Robot {
 	private Point3D pos;
 	private double speed;
 	private node_data node;
+	private node_data dest;
 	private edge_data edge;
 	private BufferedImage image;
 
@@ -21,6 +22,7 @@ public class Robot {
 		this.speed = 1;
 		this.edge = null;
 		this.node = null;
+		this.dest=null;
 	}
 	
 	public Robot(int id,Point3D pos,double speed,node_data node){
@@ -59,6 +61,15 @@ public class Robot {
 	}
 	
 	public void setNode(node_data node) {
+		this.node = node;
+	}
+	
+	
+	public node_data getDest() {
+		return node;
+	}
+	
+	public void setDest(node_data node) {
 		this.node = node;
 	}
 	

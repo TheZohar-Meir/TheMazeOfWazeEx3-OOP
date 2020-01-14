@@ -31,7 +31,7 @@ public class DGraph implements graph,Serializable{
 
 	public HashMap <Integer,node_data> NodeMap;
 	public HashMap <node_data, HashMap<Integer, edge_data>> EdgeMap;
-	private GraphRefresher listener;
+	//private GraphRefresher listener;
 	/**
 	 * Deaffult constructor sets all values to zeros and null.
 	 */
@@ -248,13 +248,13 @@ public void init(String file) {
 	}
 	
 	
-	public void addListener(GraphRefresher listener) {
-		this.listener = listener;
-	}
-	
-	public void updateListener() {
-		if(listener!= null)
-			listener.graphUpdate();
-	}
+//	public void addListener(GraphRefresher listener) {
+//		this.listener = listener;
+//	}
+//	
+//	public void updateListener() {
+//		if(listener!= null)
+//			listener.graphUpdate();
+//	}
 
 }
