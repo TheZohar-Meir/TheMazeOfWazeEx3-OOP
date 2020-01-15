@@ -7,11 +7,12 @@ import org.json.JSONObject;
 import utils.Point3D;
 
 public class Robot {
+	
 	private int id;
 	private int value;
 	private Point3D pos;
 	private double speed;
-	private node_data node;
+	private node_data src;
 	private node_data dest;
 	private edge_data edge;
 	private BufferedImage image;
@@ -21,7 +22,7 @@ public class Robot {
 		this.pos = null;
 		this.speed = 1;
 		this.edge = null;
-		this.node = null;
+		this.src = null;
 		this.dest=null;
 	}
 	
@@ -29,7 +30,7 @@ public class Robot {
 		this.id = id;
 		this.pos = pos;
 		this.speed = speed;
-		this.node = node;
+		this.src = node;
 	}
 
 	public int getId(){
@@ -56,21 +57,21 @@ public class Robot {
 		this.speed = speed;
 	}
 	
-	public node_data getNode() {
-		return node;
+	public node_data getSrc() {
+		return src;
 	}
 	
-	public void setNode(node_data node) {
-		this.node = node;
+	public void setSrc(node_data node) {
+		this.src = node;
 	}
 	
 	
 	public node_data getDest() {
-		return node;
+		return dest;
 	}
 	
 	public void setDest(node_data node) {
-		this.node = node;
+		this.dest = node;
 	}
 	
 	public edge_data getEdge() {
