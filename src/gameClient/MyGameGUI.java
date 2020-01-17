@@ -71,6 +71,8 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		//MouseLis OurMouse = new MouseLis ();
 		this.addMouseListener(this);
 
+		
+	
 	}
 
 	public MyGameGUI(DGraph Dgraph) {
@@ -86,12 +88,14 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	 * @param DGraph
 	 */
 	private void initGUI(DGraph DGraph){
-
+		
 		this.setSize(fram, fram);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setResizable(false);
 		this.setVisible(true);
-
+//		JPanel j = new JPanel();
+//		this.add(j);
+	
 		MenuBar menuBar = new MenuBar();
 		Menu menu = new Menu("Menu");
 		menuBar.add(menu);
@@ -119,6 +123,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	
 	public void paint(Graphics g) {
 
+		
 		super.paint(g);
 		//Image img = Toolkit.getDefaultToolkit().getImage(MyGameGUI.class.getResource("/gameClient/game.png"));  
 		//g.drawImage(img, 0, 0, this.getWidth(), this.getHeight(), this);  
@@ -130,6 +135,8 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		g=paintRobot(g);
 		g=paintFruit(g);
 		
+	
+		
  //System.out.println("   paintttttt   ");
 	}
 
@@ -140,6 +147,9 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 			for(Robot r : RobotsList) {
 
 				Point3D p = r.getPos();
+				
+				System.out.println("The Robot X Location is "+p.ix());
+				System.out.println("The Robot y Location is "+p.iy());
 				g.setColor(Color.BLACK);
 				int x = (int) scale(p.x(), min_x, max_x , 50 , this.getWidth()-50);
 				int y = (int) scale(p.y(), max_y, min_y , 70 , this.getHeight()-70);
@@ -654,7 +664,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 			List<String> tempFruits = new ArrayList<String>(); 
 			tempFruits = game.getFruits();
 			for(String s: tempFruits){
-
+				System.out.println("WE  just intted again the fruits");
 				Fruit f = new Fruit();
 				f.initFruit(s);
 				SetFruitData(f);
@@ -918,6 +928,21 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	}
 
 
+	
+//	public void RefreshRobotPaint (game_service game) {21
+//		
+//		
+//		
+//		
+//		
+//		
+//	}
+	
+	
+	
+	
+	
+	
 
 	public Robot FindClosestRobot (Point3D p) {
 
@@ -1135,6 +1160,48 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 //		Test.setVisible(true);
 	}
 
+	public void reDraw () {
+		
+		if(RobotsList!= null){
+			for(Robot r : RobotsList) {
+
+				Point3D p = r.getPos();
+				
+				System.out.println("The Robot X Location is "+p.ix());
+				System.out.println("The Robot y Location is "+p.iy());
+				this.getGraphics().setColor(Color.BLACK);
+				int x = (int) scale(p.x(), min_x, max_x , 50 , this.getWidth()-50);
+				int y = (int) scale(p.y(), max_y, min_y , 70 , this.getHeight()-70);
+				//	g.drawImage(RobotIMG.getImage(), x, y, null);	
+				this.getGraphics().drawRoundRect(x-12, y-8, 20, 20, 150, 150);
+			}
+		}
+		
+		
+
+		if(!FruitsList.isEmpty()){
+
+			for(Fruit f : FruitsList) {
+
+				findFruitEdge(f);
+				Point3D p = f.getPos();
+				if(f.getType() == 1) this.getGraphics().setColor(Color.magenta);
+				else this.getGraphics().setColor(Color.YELLOW);
+				int x = (int) scale(p.x(), min_x, max_x , 50, this.getWidth()-50);
+				int y = (int) scale(p.y(), max_y, min_y ,70 , this.getHeight()-70);
+				this.getGraphics().fillOval(x-8, y-8, 15	, 15);
+			}
+		}
+	
+		
+		//repaint();
+	}
+
+		
+		
+
+	
+	
 	@Override
 	public void run() {
 		
@@ -1144,17 +1211,25 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 			game.startGame();
 			System.out.println("Game is not null ");
 		while(game.isRunning()) {
+			System.out.println("Game Is Fucking Runnnint");
 		FruitInit(game);
 		RobotInitAuto(game);
 		MoveAutoGame(game);
-		repaint();
+		reDraw();
+	//	paintComponents(this.getGraphics());
+//		this.setComponentZOrder(this.repaint(), 0);
+		//revalidate();
+//		Graphics g = getGraphics();
+//		if (g != null) paintComponent(g);
+//		else repaint();
+		
 		
 		}
 		System.out.println(game.toString());
 	}
 		System.out.println("Game is null");
+	
+	}
 	}
 
-
-}
 

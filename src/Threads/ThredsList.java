@@ -16,12 +16,15 @@ public class ThredsList implements Runnable{
 	
 	
 	
+	private static final int MAX_PRIORITY = 0;
+
 	public static void main(String[] args) {
 	
 		
 		
 		MyGameGUI GThread = new MyGameGUI();
 		Thread G = new Thread (GThread);
+		
 	//	MyGameGUI Test =  new MyGameGUI();
 	//	Test.setVisible(true);
 		//RunGameT PlaySolo = new RunGameT();
@@ -29,6 +32,8 @@ public class ThredsList implements Runnable{
 		//Thread t = new Thread(PlaySolo);
 		//G.setPriority(MAX_PRIORITY);
 		G.start();
+		
+
 	//	t.start();
 		
 		
