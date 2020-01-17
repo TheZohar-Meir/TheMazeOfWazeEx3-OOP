@@ -7,7 +7,7 @@ import gameClient.MyGameGUI;
 public class RunGameT implements Runnable{
 
 
-	game_service game;
+	public game_service game;
 	//	public static int src = -1;
 	//	public static int dest = -1;
 	//	public  static boolean waiting ;
@@ -24,14 +24,13 @@ public class RunGameT implements Runnable{
 
 	@Override
 	public void run() {
-
+		
 		if(game!=null) {
 			game.startGame();
-
+			
 			while(game.isRunning()) {
-				System.out.println("I'm running");
-
 				
+		 	System.out.println("I'm running");
 
 			}
 		}

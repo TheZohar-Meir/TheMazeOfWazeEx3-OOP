@@ -5,6 +5,8 @@ import java.awt.image.BufferedImage;
 
 import org.json.JSONObject;
 import utils.Point3D;
+import utils.*;
+import gameClient.*;
 public class Fruit {
 
 	private int value;
@@ -12,6 +14,28 @@ public class Fruit {
 	private Point3D pos;
 	private edge_data edge;
 	BufferedImage myImage;
+	private node_data ClosestNode;
+	private int src;
+	private int dest;
+	public boolean Rot=false;  // Robot on the way
+	
+	public int getSrc() {
+		return src;
+	}
+
+	public void setSrc(int src) {
+		this.src = src;
+	}
+
+	public int getDest() {
+		return dest;
+	}
+
+	public void setDest(int dest) {
+		this.dest = dest;
+	}
+
+	public double dist;
 
 	public Fruit(){
 		this.value = 0;
@@ -20,6 +44,14 @@ public class Fruit {
 		this.edge=null;
 	}
 	
+	public double getDist() {
+		return dist;
+	}
+
+	public void setDist(double dist) {
+		this.dist = dist;
+	}
+
 	public Fruit(int val,int type, Point3D pos, edge_data edge){
 		this.value = val;
 		this.type = type;
@@ -59,6 +91,19 @@ public class Fruit {
 		this.edge = edge;
 	}
 
+	
+	
+
+	public node_data getClosestNode() {
+		return ClosestNode;
+	}
+
+	public void setClosestNode(node_data closestNode) {
+		ClosestNode = closestNode;
+	}
+	
+	
+	
 	public void initFruit(String g){
 		
 		if(!g.isEmpty()){
@@ -79,8 +124,17 @@ public class Fruit {
 			catch (Exception e) {
 				e.printStackTrace();
 			}
+			
+			
+			
+			
+			
+			
 		}
 	}
+	
+	
+	
 
 
 

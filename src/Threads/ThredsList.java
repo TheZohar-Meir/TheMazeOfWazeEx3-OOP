@@ -2,7 +2,7 @@ package Threads;
 
 import gameClient.MyGameGUI;
 
-public class ThredsList extends Thread{
+public class ThredsList implements Runnable{
 
 	
 	
@@ -22,13 +22,14 @@ public class ThredsList extends Thread{
 		
 		MyGameGUI GThread = new MyGameGUI();
 		Thread G = new Thread (GThread);
-		
-		RunGameT PlaySolo = new RunGameT();
-		PlaySolo.game=GThread.game;
-		Thread t = new Thread(PlaySolo);
-		G.setPriority(MAX_PRIORITY);
-		G.run();
-		t.run();
+	//	MyGameGUI Test =  new MyGameGUI();
+	//	Test.setVisible(true);
+		//RunGameT PlaySolo = new RunGameT();
+	//	PlaySolo.game=GThread.game;
+		//Thread t = new Thread(PlaySolo);
+		//G.setPriority(MAX_PRIORITY);
+		G.start();
+	//	t.start();
 		
 		
 		
@@ -49,6 +50,12 @@ public class ThredsList extends Thread{
 		
 		
 
+	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

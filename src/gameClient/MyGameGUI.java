@@ -28,6 +28,7 @@ import javax.swing.JPanel;
 import org.json.JSONException;
 import org.json.JSONObject;
 import dataStructure.DGraph;
+import dataStructure.Edge;
 import dataStructure.edge_data;
 import dataStructure.graph;
 import dataStructure.node_data;
@@ -37,7 +38,8 @@ import dataStructure.Robot;
 import gui.GraphRefresher;
 import Server.Game_Server;
 import Server.game_service;
-import Threads.RunGameT; 
+import Threads.RunGameT;
+import algorithms.Graph_Algo; 
 
 public class MyGameGUI extends JFrame implements ActionListener , Serializable,  GraphRefresher, MouseListener, Runnable{
 
@@ -48,6 +50,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	ImageIcon RobotIMG = new ImageIcon("/gameClient/RobotImage.jpg");
 	ImageIcon FruitIMG = new ImageIcon();
 	private DGraph DG = new DGraph();
+	private Graph_Algo GA;
 	private graph GG;
 	private static double min_x = 35.18725458757062;
 	private static double max_x = 35.21315127845036;
@@ -58,12 +61,12 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	public game_service game=null;
 	BufferedImage myImage;
 
-
 	public MyGameGUI() {
 		int scenario_num = 0;
 		game_service game = Game_Server.getServer(scenario_num); // you have [0,23] games
 		String g = game.getGraph();
 		DG.init(g);
+		GG = null;
 		initGUI(DG);
 		//MouseLis OurMouse = new MouseLis ();
 		this.addMouseListener(this);
@@ -72,6 +75,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 
 	public MyGameGUI(DGraph Dgraph) {
 		this.DG = Dgraph;
+		GG = Dgraph;
 		initGUI(DG);
 		this.addMouseListener(this);
 	}
@@ -110,17 +114,26 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	/**
 	 * 
 	 */
+
+	
+	
 	public void paint(Graphics g) {
 
 		super.paint(g);
-		Image img = Toolkit.getDefaultToolkit().getImage(MyGameGUI.class.getResource("/gameClient/game.png"));  
-		g.drawImage(img, 0, 0, this.getWidth(), this.getHeight(), this);  
-
+		//Image img = Toolkit.getDefaultToolkit().getImage(MyGameGUI.class.getResource("/gameClient/game.png"));  
+		//g.drawImage(img, 0, 0, this.getWidth(), this.getHeight(), this);  
+		int i=0;
+		if( i==0) {
 		paintGraph(g);
+		i++;
+		}
 		g=paintRobot(g);
 		g=paintFruit(g);
+		
+ //System.out.println("   paintttttt   ");
 	}
 
+	
 	public Graphics paintRobot(Graphics g) {
 
 		if(RobotsList!= null){
@@ -268,6 +281,24 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	}
 
 
+	//	/**
+	//	 * 
+	//	 * @param p
+	//	 * @param p2
+	//	 * @return
+	//	 */
+	//	private double dist2(int src, int dest) {
+	//
+	//		edge_data x = DG.getEdge(src, dest);
+	//		double w = x.getWeight();
+	//				
+	//		double ans = Math.sqrt(Math.pow((p.x()-p2.x()),2)+(Math.pow((p.y()-p2.y()),2)));
+	//		return ans;
+	//	}
+
+
+
+
 	/**
 	 * 
 	 */
@@ -277,31 +308,162 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 
 
 	/**
+	 * @throws InterruptedException 
 	 * 
 	 */
-	private void CreateAuto() {
+	private void CreateAuto() throws InterruptedException {
 
 		String user_input = JOptionPane.showInputDialog(null, "Please enter your scenario number ([0,23]) ");
 		int scenario_num = Integer.parseInt(user_input) ;
 
 		while (scenario_num<0||scenario_num>23){
-			user_input = JOptionPane.showInputDialog(null,"Please Enter a value between 0-23 ");
+		 user_input = JOptionPane.showInputDialog(null,"Please Enter a value between 0-23 ");
 			scenario_num = Integer.parseInt(user_input) ;
 		}
 		game_service game = Game_Server.getServer(scenario_num); // you have [0,23] games
-		System.out.println(game);
+		this.game=game;
+		System.out.println(this.game);
 		String g = game.getGraph();
 		DGraph gg = new DGraph();
 		gg.init(g);
 		this.DG=gg;
-		FruitInit(game);
-		RobotInitAuto(game);
+		this.GG = DG;
+		this.GA = new Graph_Algo(GG);
+		
+		FruitInit(this.game);
+		RobotInitAuto(this.game);
+		 
 		initGUI(this.DG);
+		
+		//Thread Initier = new Thread();
+		//Initier.run();
+//		RunGameT PlaySolo = new RunGameT();
+//		PlaySolo.SetGame(this.game);
+//		Thread t = new Thread(PlaySolo);
+//		t.start();
+		this.run();
+		//game.startGame();
+
+		//System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"); 
+
+		//System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"); 
+//		while (game.isRunning()) {
+//			notifyAll();
+//			Initier.start();
+			//MoveAutoGame(game);	
+////								for (String sys : game.move())
+////									System.out.println(sys);
+//		}
+
+
 	}
 
+
+
+
+	public void MoveAutoGame (game_service game) {
+
+		Graph_Algo a = new Graph_Algo();
+		a.init(DG);
+
+		for (Robot tempRob : RobotsList) {
+			
+			if(FindClosestFruit(tempRob).Rot==false){
+
+				int arg1 = tempRob.getSrcId();
+				//int arg2 = FindClosestFruit(tempRob).getDest();
+				int arg2 = arg1-1;
+				
+				if(arg2 <0)arg2 = 10;
+				//System.out.println("arg1 :"+arg1);
+				//System.out.println("arg2 :"+arg2);
+//				if(des == src) {
+//					for(Fruit lol: FruitsList) {
+//						if(lol.getPos() == p) {
+//							des = lol.getSrc();
+//						}
+//					}	
+//				}
+//				int ans = -1 ;
+//				List<node_data> list = GA.shortestPath(src,des );
+//				if( list.size()>1) ans = list.get(1).getKey();
+//				else {
+//					ans = list.get(0).getKey();
+//				}
+				if(arg1 == arg2) {
+//					node_data n = DG.NodeMap.get(arg1);
+//					DG.getE(n.getKey());
+					arg2 = 7;
+				}	
+				
+				List<node_data> lis = a.shortestPath(arg1,arg2);
+				if(lis.size()>1)tempRob.setDest(lis.get(1));
+				else {
+					tempRob.setDest(lis.get(0));
+				}
+				
+				//System.out.println("next destenation: "+a.shortestPath(arg1,arg2).get(1).getKey());
+				FindClosestFruit(tempRob).Rot=true;
+				game.chooseNextEdge(tempRob.getId(), tempRob.getDest().getKey());
+				game.move();
+			}
+		}
+		repaint();
+	}
+
+
+
+	private Fruit FindClosestFruit(Robot TempRobot) {
+
+		Fruit ans =new Fruit();
+		int i=0;
+		double shortestDis=0;
+
+		for (Fruit tempFruit : FruitsList ) {
+
+			double x = tempFruit.getPos().x();
+			double y = tempFruit.getPos().y();
+			Point3D FruitPos = new Point3D(scale(x, min_x, max_x , 50 , this.getWidth()-50),scale(y,max_y, min_y , 70 , this.getHeight()-70));
+
+			if (i==0) {
+				shortestDis=dist(FruitPos, TempRobot.getPos());
+				i++;
+			}
+			if (dist(FruitPos, TempRobot.getPos())<=shortestDis) {
+				shortestDis=dist(FruitPos,TempRobot.getPos());
+				ans=tempFruit;
+			}
+		}
+		return ans;
+	}
+
+
+
+
+	public int AutoFindClosestDest(int src , Point3D p) {
+
+		int des = FindClosestSrcToFruit(p);
+		if(des == src) {
+			for(Fruit lol: FruitsList) {
+				if(lol.getPos() == p) {
+					des = lol.getSrc();
+				}
+			}	
+		}
+		int ans = -1 ;
+		List<node_data> list = GA.shortestPath(src,des );
+		if( list.size()>1) ans = list.get(1).getKey();
+		else {
+			ans = list.get(0).getKey();
+		}
+		return ans;
+	}
+
+
+
+
 	private void RobotInitAuto (game_service game) {
-		
-		
+
 		if(!RobotsList.isEmpty())RobotsList.clear();
 		String gameInfo = game.toString();
 		try {
@@ -309,51 +471,48 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 			JSONObject line = new JSONObject(gameInfo);
 			JSONObject mygame = line.getJSONObject("GameServer");
 			int R_amount = mygame.getInt("robots");
-
 			int j=0;
-			int RobotLocation=0;
-			for(int a = 0;a<R_amount;a++) { //loop to add robots to the server
+			ArrayList<Double> FruitsDist = new ArrayList<Double>(); 
 
-			
-				RobotLocation = NodeCloseToFruit(FruitsList.get(j));
-				System.out.println("X Position : "+FruitsList.get(j).getPos().x());
-				System.out.println("Y Position : "+FruitsList.get(j).getPos().y());
-				System.out.println(RobotLocation);
-				game.addRobot(RobotLocation);
+			for(int a = 0;a<R_amount;a++) { //loop to add robots to the server
+				NodeCloseToFruit(FruitsList.get(j));
+				FruitsDist.add(FruitsList.get(j).getDist());
 				j++;
 			}
 
+			FruitsDist.sort(null);
+			for (double tempD : FruitsDist) {
+				int i=0;
+				while (FruitsList.get(i).getDist() != tempD) {
+					i++;
+				}
+				game.addRobot(FruitsList.get(i).getClosestNode().getKey());
+			}
 			List<String> tempRobots = new ArrayList<String>(); 
 			tempRobots = game.getRobots();
-
 			for(String s: tempRobots){
-
 				Robot r = new Robot();
 				r.RobotFromJSON(s);
 				RobotsList.add(r);
 			}
 		}
 		catch (JSONException e) {e.printStackTrace();}
-
 		repaint();
-		
-		
-		
-		
 	}
-	
-	
+
+
+
 	public int NodeCloseToFruit (Fruit f) {
-		
+
 		int ans=0;
 		int i=0;
 		double shortestDis=0;
 		Point3D Fpoint = f.getPos();
 		Point3D TeMpoint = new Point3D(scale(Fpoint.x(), min_x, max_x , 50 , this.getWidth()-50),scale(Fpoint.y(),max_y, min_y , 70 , this.getHeight()-70));
-		
-		
+
+
 		Collection<node_data> Nodes = DG.getV();
-		
+
 		for (node_data tempNode : Nodes ) {
 
 			double x = tempNode.getLocation().x();
@@ -362,21 +521,23 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 			// Fpoint is the converting of x and y from point to frames.
 
 			if (i==0) {
-				shortestDis=dist(Npoint, TeMpoint);
+				shortestDis = dist(Npoint, TeMpoint);
+				//shortestDis = dist2(tempNode.getKey(), FindClosestDest(tempNode.getKey() ,f.getPos() );
 				i++;
-			}
+			}	
 
 			if (dist(Npoint, TeMpoint)<=shortestDis) {
 
 				shortestDis=dist(Npoint, TeMpoint);
 				ans = tempNode.getKey();
+				f.setDist(shortestDis);
+				f.setClosestNode(tempNode);
 			}
 		}
-		System.out.println(ans);
 		return ans;
 	}
-	
-	
+
+
 
 	/**
 	 * 
@@ -398,35 +559,38 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		DGraph gg = new DGraph();
 		gg.init(g);
 		this.DG = gg;
-		initGUI(this.DG);
+		this.GG = DG;
+		this.GA = new Graph_Algo(GG);
 		
+		initGUI(this.DG);
+
 		FruitInit(game);
 		RobotInit(game); // read from JSONfile, build robots and add them to RobotsList. 
-		RunGameT PlaySolo = new RunGameT();
-		PlaySolo.SetGame(game);
-		Thread t = new Thread(PlaySolo);
-		t.run();
-		
+		//RunGameT PlaySolo = new RunGameT();
+		//PlaySolo.SetGame(game);
+		//Thread t = new Thread(PlaySolo);
+		//t.run();
+
 		//RunGameT.StartCustom(game);
 		//game.startGame();
 		//t.run();
 		//t.start();
-//		try {
-//			Thread.sleep(1000);
-//			System.out.println("Im sleeping");
-//		} catch (InterruptedException e) {
-//		
-//			e.printStackTrace();
-//		}
+		//		try {
+		//			Thread.sleep(1000);
+		//			System.out.println("Im sleeping");
+		//		} catch (InterruptedException e) {
+		//		
+		//			e.printStackTrace();
+		//		}
 		//repaint();
 		//Thread  RunGame = new Thread() ;
 		//game.startGame();
-					//should be a Thread!!!
-//		while(game.isRunning()) {
-//			ManualPlay(game);
-//		}
+		//should be a Thread!!!
+		//		while(game.isRunning()) {
+		//			ManualPlay(game);
+		//		}
 		String results = game.toString();
-		
+
 		this.game=game;
 		System.out.println("Game Over: "+results);
 		repaint();
@@ -487,15 +651,14 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 			FruitsList.clear();
 		}
 		try {
-
 			List<String> tempFruits = new ArrayList<String>(); 
 			tempFruits = game.getFruits();
 			for(String s: tempFruits){
 
 				Fruit f = new Fruit();
 				f.initFruit(s);
+				SetFruitData(f);
 				FruitsList.add(f);
-				//System.out.println("F X VALUE IS:" +f.getPos().x());
 			}
 		}
 		catch (Exception e) {e.printStackTrace();}
@@ -515,38 +678,40 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		}
 	}
 
-	/** 
-	 * Moves each of the robots along the edge, 
-	 * in case the robot is on a node the next destination (next edge) is chosen (randomly).
-	 * @param game
-	 * @param gg
-	 * @param log
-	 */
-	private static void AutoMoveRobots(game_service game, graph gg) {
+//	/** 
+//	 * Moves each of the robots along the edge, 
+//	 * in case the robot is on a node the next destination (next edge) is chosen (randomly).
+//	 * @param game
+//	 * @param gg
+//	 * @param log
+//	 */
+//	private static void AutoMoveRobots(game_service game, graph gg) {
+//
+//		List<String> log = game.move();
+//		if(log!=null) {
+//			long t = game.timeToEnd();
+//			for(int i=0;i<log.size();i++) {
+//				String robot_json = log.get(i);
+//				try {
+//					JSONObject line = new JSONObject(robot_json);
+//					JSONObject ttt = line.getJSONObject("Robot");
+//					int rid = ttt.getInt("id");
+//					int src = ttt.getInt("src");
+//					int dest = ttt.getInt("dest");
+//
+//					if(dest==-1) {	
+//						dest = nextNode(gg, src);
+//						game.chooseNextEdge(rid, dest);
+//						System.out.println("Turn to node: "+dest+"  time to end:"+(t/1000));
+//						System.out.println(ttt);
+//					}
+//				} 
+//				catch (JSONException e) {e.printStackTrace();}
+//			}
+//		}
+//	}
 
-		List<String> log = game.move();
-		if(log!=null) {
-			long t = game.timeToEnd();
-			for(int i=0;i<log.size();i++) {
-				String robot_json = log.get(i);
-				try {
-					JSONObject line = new JSONObject(robot_json);
-					JSONObject ttt = line.getJSONObject("Robot");
-					int rid = ttt.getInt("id");
-					int src = ttt.getInt("src");
-					int dest = ttt.getInt("dest");
 
-					if(dest==-1) {	
-						dest = nextNode(gg, src);
-						game.chooseNextEdge(rid, dest);
-						System.out.println("Turn to node: "+dest+"  time to end:"+(t/1000));
-						System.out.println(ttt);
-					}
-				} 
-				catch (JSONException e) {e.printStackTrace();}
-			}
-		}
-	}
 	/**
 	 * a very simple random walk implementation!
 	 * @param g
@@ -554,6 +719,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	 * @return
 	 */
 	private static int nextNode(graph g, int src) {
+
 		int ans = -1;
 		Collection<edge_data> ee = g.getE(src);
 		Iterator<edge_data> itr = ee.iterator();
@@ -582,7 +748,6 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 			if(p.y() > max_y)max_y = p.y();
 			if(p.y() < min_y)min_y = p.y();
 		}
-
 		//		System.out.println(min_x);
 		//		System.out.println(max_x);
 		//		System.out.println(max_y);
@@ -592,13 +757,13 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 
 	private void StartCustom(game_service game)
 	{
-//		game.startGame();
-//		//ThreadPaint(game);
-//		//ThreadMouse(game);
-//		while(game.isRunning()) {
-//			//initGUI();
-//			ManualPlay(game);
-//		}
+		//		game.startGame();
+		//		//ThreadPaint(game);
+		//		//ThreadMouse(game);
+		//		while(game.isRunning()) {
+		//			//initGUI();
+		//			ManualPlay(game);
+		//		}
 		String results = game.toString();
 		System.out.println("Game Over: "+results);
 
@@ -612,10 +777,8 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		int destMove=-1;
 		if(log != null)
 		{
-			
-		
 			if(currentRobot.getDest() != null) {
-				 destMove = currentRobot.getDest().getKey();
+				destMove = currentRobot.getDest().getKey();
 			}
 			if(destMove!= -1) {
 
@@ -631,7 +794,6 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 
 
 	private int ManuelNext(game_service game){
-
 		int dest=0;
 		return dest;
 	}
@@ -650,7 +812,6 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	 */
 	private double scale(double data, double r_min, double r_max,double t_min, double t_max)
 	{
-
 		double res = ((data - r_min) / (r_max-r_min)) * (t_max - t_min) + t_min;
 		return res;
 	}
@@ -677,7 +838,6 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 					shortestDis=dist(Fpoint, p);
 					i++;
 				}
-
 				if (dist(Fpoint, p)<=shortestDis) {
 
 					shortestDis=dist(Fpoint, p);
@@ -688,6 +848,45 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		}
 		return -1;
 	}
+
+
+
+	public int FindClosestSrcToFruit (Point3D p) {
+
+		int ans=0;
+		int i=0;
+		double shortestDis=0;
+
+		Point3D Fpoint = new Point3D(scale(p.x(), min_x, max_x , 50 , this.getWidth()-50),scale(p.y(),max_y, min_y , 70 , this.getHeight()-70));
+		Collection<node_data> Nodes = DG.getV();
+
+		for (node_data tempNode : Nodes ) {
+
+			double x = tempNode.getLocation().x();
+			double y = tempNode.getLocation().y();
+			Point3D Npoint = new Point3D(scale(x, min_x, max_x , 50 , this.getWidth()-50),scale(y,max_y, min_y , 70 , this.getHeight()-70));
+			// Fpoint is the converting of x and y from point to frames.
+
+			if (i==0) {
+				shortestDis=dist(Npoint, Fpoint);
+				i++;
+			}
+
+			if (dist(Npoint, Fpoint)<=shortestDis) {
+
+				//System.out.println(tempNode.getKey());
+				shortestDis=dist(Npoint, Fpoint);
+				ans = tempNode.getKey();
+			}
+		}
+		return ans;
+	}
+
+
+
+
+
+
 
 
 	public int FindClosestSrc (Point3D p) {
@@ -711,7 +910,6 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 			}
 
 			if (dist(Fpoint, p)<=shortestDis) {
-
 				shortestDis=dist(Fpoint, p);
 				ans = tempNode.getKey();
 			}
@@ -746,8 +944,27 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		}
 		return ans;
 	}
-	
-	
+
+	private void SetFruitData (Fruit f) {
+
+		int fSrc = FindClosestSrcToFruit (f.getPos());
+		int fDest = AutoFindClosestDest(fSrc, f.getPos());
+
+		if (f.getType()==1) {
+
+			if (fSrc>fDest) {
+				f.setSrc(fDest);
+				f.setDest(fSrc);
+			}
+			else {
+				f.setSrc(fSrc);
+				f.setDest(fDest);
+			}
+			f.setEdge(DG.getEdge(f.getSrc(), f.getDest()));
+		}
+	}
+
+
 	private int src = -1;
 	private int dest = -1;
 	private boolean waiting ;
@@ -758,23 +975,19 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	public void mouseClicked(MouseEvent e) 
 	{
 		this.e=e;
-		
 		int x = e.getX();
 		int y = e.getY();
 		Point3D p = new Point3D(x,y); 
-
 
 		if(isAlreadyOneClick) 
 		{
 			click2 = true;
 			isAlreadyOneClick = false;
 			dest = clickTwice(currentRobot, p,currentRobot.getSrc().getKey());
-			//System.out.println("stammm 222222222");
 		} 
 		else
 		{
 			isAlreadyOneClick = true;
-			//System.out.println("waitingggg   ");
 			waiting = true;
 			Timer t = new Timer("doubleclickTimer", false);
 			t.schedule(new TimerTask() {
@@ -782,17 +995,12 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 				@Override
 				public void run() {
 					isAlreadyOneClick = false;
-					//System.out.println("stopppppp");
-
 					if(!click2)waiting = false;
 					click2 = false;
 					if(!waiting) currentRobot = clickOnce(currentRobot, p);
-
 				}
 			}, 400);
 		}
-		
-		
 		//e.notifyAll();
 	}
 
@@ -807,6 +1015,8 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		System.out.println();
 		System.out.println(" 111111 Current Robot close to Node "+tempsrc);
 		System.out.println();
+		repaint();
+		
 		return currentRobot;
 	}
 
@@ -817,50 +1027,51 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		currentRobot.setDest(DG.getNode(dest));
 		System.out.println(" 222222 Current Robot dest is Node "+dest);
 		System.out.println();
+		repaint();
 		return dest;
 	}
 
-	
-	
-//	public static void StartCustom(game_service game)
-//	{
-//		game.startGame();
-//		//ThreadPaint(game);
-//		//ThreadMouse(game);
-//		while(game.isRunning()) {
-//			//initGUI();
-//			System.out.println("Game Is Running");
-//			ManualPlay(game);
-//		}
-//		String results = game.toString();
-//		System.out.println("Game Over: "+results);
-//
-//
-//	}
-	
-	
-	
-//	public static void ManualPlay(game_service game){
-//
-//		List<String> log = game.move();
-//		int destMove=-1;
-//		if(log != null)
-//		{
-//			
-//		
-//			if(currentRobot.getDest() != null) {
-//				 destMove = currentRobot.getDest().getKey();
-//			}
-//			if(destMove!= -1) {
-//
-//				if(currentRobot!= null) {
-//					game.chooseNextEdge(currentRobot.getSrc().getKey(), destMove);
-//					game.move();
-//					//repaint();
-//				}
-//			}
-//		}
-//	}
+
+
+	//	public static void StartCustom(game_service game)
+	//	{
+	//		game.startGame();
+	//		//ThreadPaint(game);
+	//		//ThreadMouse(game);
+	//		while(game.isRunning()) {
+	//			//initGUI();
+	//			System.out.println("Game Is Running");
+	//			ManualPlay(game);
+	//		}
+	//		String results = game.toString();
+	//		System.out.println("Game Over: "+results);
+	//
+	//
+	//	}
+
+
+
+	//	public static void ManualPlay(game_service game){
+	//
+	//		List<String> log = game.move();
+	//		int destMove=-1;
+	//		if(log != null)
+	//		{
+	//			
+	//		
+	//			if(currentRobot.getDest() != null) {
+	//				 destMove = currentRobot.getDest().getKey();
+	//			}
+	//			if(destMove!= -1) {
+	//
+	//				if(currentRobot!= null) {
+	//					game.chooseNextEdge(currentRobot.getSrc().getKey(), destMove);
+	//					game.move();
+	//					//repaint();
+	//				}
+	//			}
+	//		}
+	//	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
@@ -896,7 +1107,12 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		switch(input) {
 		case "New Custom Game":CreateCustom();
 		break;
-		case "New Auto Game": CreateAuto();
+		case "New Auto Game": try {
+				CreateAuto();
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		break;
 		default:
 			break;
@@ -912,30 +1128,33 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	public void setMyImage(BufferedImage myImage) {
 		this.myImage = myImage;
 	}
-	
-	
-	
-	
-	
-	
 
 	public static void main(String[] args) {
 
-		MyGameGUI Test =  new MyGameGUI();
-		Test.setVisible(true);
+//		MyGameGUI Test =  new MyGameGUI();
+//		Test.setVisible(true);
 	}
 
 	@Override
 	public void run() {
 		
-		MyGameGUI Test =  new MyGameGUI();
-		Test.setVisible(true);
+		System.out.println("Thread RUns");
+
+		if(game!=null) {
+			game.startGame();
+			System.out.println("Game is not null ");
+		while(game.isRunning()) {
+		FruitInit(game);
+		RobotInitAuto(game);
+		MoveAutoGame(game);
+		repaint();
 		
-		
-		
+		}
+		System.out.println(game.toString());
+	}
+		System.out.println("Game is null");
 	}
 
-	
 
 }
 

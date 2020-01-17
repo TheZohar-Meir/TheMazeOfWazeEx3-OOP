@@ -171,7 +171,10 @@ public class DGraph implements graph,Serializable{
 		}
 		return null;
 	}
-public void init(String file) {
+	
+	
+	
+	public void init(String file) {
 		
 		try
 		{
@@ -202,6 +205,8 @@ public void init(String file) {
 			System.out.println(ex.toString());
 		}
 	}
+	
+	
 	
 	/**
 	 * removing the edge between the two given nodes.

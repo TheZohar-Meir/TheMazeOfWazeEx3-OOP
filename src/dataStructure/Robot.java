@@ -1,6 +1,8 @@
 package dataStructure;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONObject;
 
@@ -13,9 +15,12 @@ public class Robot {
 	private Point3D pos;
 	private double speed;
 	private node_data src;
-	private node_data dest;
+	private int SrcId;
+ 	private node_data dest;
 	private edge_data edge;
 	private BufferedImage image;
+	public boolean moving = false;
+	public List<node_data> moveList = new ArrayList<node_data>();
 
 	public Robot(){
 		this.id = 0;
@@ -117,12 +122,22 @@ public class Robot {
 				this.value = value;
 				int speed = CurrBot.getInt("speed");
 				this.speed = speed;
+				int src = CurrBot.getInt("src");
+				this.setSrcId(src);
 				
 			}
 			catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public int getSrcId() {
+		return SrcId;
+	}
+
+	public void setSrcId(int srcId) {
+		SrcId = srcId;
 	}
 	
 }
