@@ -17,7 +17,7 @@ public class Fruit {
 	private node_data ClosestNode;
 	private int src;
 	private int dest;
-	public boolean Rot=false;  // Robot on the way
+	public boolean Rot = false;  // Robot on the way
 	
 	public int getSrc() {
 		return src;

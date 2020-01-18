@@ -4,7 +4,7 @@ import java.util.List;
 import Server.game_service;
 import dataStructure.Robot;
 import gameClient.MyGameGUI;
-public class RunGameT implements Runnable{
+public class RunGameT extends MyGameGUI implements Runnable{
 
 
 	public game_service game;
@@ -17,7 +17,7 @@ public class RunGameT implements Runnable{
 
 
 
-	public static void main(String[] args) {
+	public static void main(String[] args)  {
 		// TODO Auto-generated method stub
 
 	}
@@ -30,7 +30,10 @@ public class RunGameT implements Runnable{
 			
 			while(game.isRunning()) {
 				
-		 	System.out.println("I'm running");
+//				FruitInit(game);
+//				RobotInitAuto(game);
+//				MoveAutoGame(game);
+				System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
 
 			}
 		}
