@@ -14,6 +14,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,6 +23,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -31,6 +35,9 @@ import javax.swing.SwingUtilities;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.sun.xml.internal.bind.WhiteSpaceProcessor;
+
 import dataStructure.DGraph;
 import dataStructure.Edge;
 import dataStructure.edge_data;
@@ -121,9 +128,14 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	/**
 	 * 
 	 */
+	
+	
+	
+	
 	public void paint(Graphics g) {
 
 		super.paint(g);	
+		
 		//Image img = Toolkit.getDefaultToolkit().getImage(MyGameGUI.class.getResource("/gameClient/game.png"));  
 		//g.drawImage(img, 0, 0, this.getWidth(), this.getHeight(), this);  
 		paintGraph(g);
@@ -140,14 +152,26 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		if(RobotsList!= null){
 			for(Robot r : RobotsList) {
 				Point3D p = r.getPos();
-				g.setColor(Color.BLACK);
+				 try {
+					 
+				BufferedImage Robot_image = ImageIO.read(new File("data/RobotImage.jpg"));
 				int x = (int) scale(p.x(), min_x, max_x , 50 , this.getWidth()-50);
 				int y = (int) scale(p.y(), max_y, min_y , 70 , this.getHeight()-70);
 				//	g.drawImage(RobotIMG.getImage(), x, y, null);	
 				this.LastRobotX = x-12;
 				this.LastRobotY = y-8;
+				g.drawImage(Robot_image, x-12, y-8, null);
+				
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				//g.setColor(Color.BLACK);
+				
+				
 
-				g.drawRoundRect(x-12, y-8, 20, 20, 150, 150);
+				//g.drawRoundRect(x-12, y-8, 20, 20, 150, 150);
 				//	g.drawRect(x-12, y-8, 20, 20);
 				//g.fillOval(x-12, y-8, 20, 20);
 				//g.drawRect(x-12, y-8, 20, 20, 150, 150);
@@ -1000,18 +1024,31 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	public void run() {
 
 
-		int dt = 100;
+		int Manualdt = 100;
+		int Autodt = 50;
 
 		if(this.game!=null) {
 			this.game.startGame();
 
 			while(game.isRunning()) {
 				if (this.Auto) {
+					
+					try {
 					game.move();
 					FruitInit(this.game);
 					UpdateRobots(this.game);
 					MoveAutoGame(this.game);
-					reDraw();
+					//reDraw();
+					this.removeAll();
+					
+					repaint();
+					
+					Thread.sleep(Autodt);
+					}
+					catch (InterruptedException e) {
+						e.printStackTrace();
+						
+					}
 				}
 				else {
 					try {
@@ -1020,7 +1057,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 						UpdateRobots(this.game);
 						reDraw();
 						//repaint();
-						Thread.sleep(dt);
+						Thread.sleep(Manualdt);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
