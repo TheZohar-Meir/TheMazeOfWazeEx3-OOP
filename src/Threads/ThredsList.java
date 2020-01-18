@@ -10,6 +10,8 @@ public class ThredsList implements Runnable{
 	
 		MyGameGUI GThread = new MyGameGUI();
 		Thread G = new Thread (GThread);
+		G.start();
+		
 		
 	//	MyGameGUI Test =  new MyGameGUI();
 	//	Test.setVisible(true);
@@ -17,7 +19,7 @@ public class ThredsList implements Runnable{
 	//	PlaySolo.game=GThread.game;
 		//Thread t = new Thread(PlaySolo);
 		//G.setPriority(MAX_PRIORITY);
-		G.start();
+		//G.start();
 	//	t.start();
 //		if( GThread.game!=null){
 //			System.out.println("Game is not Null game should run");

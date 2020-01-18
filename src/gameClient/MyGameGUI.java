@@ -10,6 +10,7 @@ import java.awt.MenuBar;
 import java.awt.MenuItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
@@ -26,6 +27,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import dataStructure.DGraph;
@@ -63,6 +66,8 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	public static MouseEvent e;
 	public game_service game=null;
 	BufferedImage myImage;
+	private boolean Auto=false;
+	private Thread ourT;
 	//Graphics myG;
 
 	public MyGameGUI() {
@@ -107,6 +112,9 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		MenuItem item4 = new MenuItem("New Auto Game");
 		item4.addActionListener(this);
 		menu.add(item4);	
+
+		ourT=new Thread(this);
+
 	}
 
 
@@ -295,7 +303,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		return Math.abs(ans);
 	}
 
-	
+
 	/**
 	 * 
 	 */
@@ -311,6 +319,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	private void CreateAuto() throws InterruptedException {
 
 		this.clear();
+		this.Auto=true;
 		String user_input = JOptionPane.showInputDialog(null, "Please enter your scenario number ([0,23]) ");
 		int scenario_num = Integer.parseInt(user_input) ;
 
@@ -318,6 +327,8 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 			user_input = JOptionPane.showInputDialog(null,"Please Enter a value between 0-23 ");
 			scenario_num = Integer.parseInt(user_input) ;
 		}
+
+
 		game_service game = Game_Server.getServer(scenario_num); // you have [0,23] games
 		this.game=game;
 		System.out.println(this.game);
@@ -340,7 +351,10 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		//		Thread t = new Thread(PlaySolo);
 		//		t.start();
 		//repaint();
-		this.run();
+
+
+
+		ourT.start();
 	}
 
 
@@ -507,7 +521,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	private void CreateCustom() {
 
 		this.clear();
-
+		this.Auto=false;
 		String user_input = JOptionPane.showInputDialog(null, "Please enter your scenario number ([0,23]) ");
 		int scenario_num = Integer.parseInt(user_input) ;
 
@@ -515,19 +529,27 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 			user_input = JOptionPane.showInputDialog(null,"Please Enter a value between 0-23 ");
 			scenario_num = Integer.parseInt(user_input) ;
 		}
+
 		game_service game = Game_Server.getServer(scenario_num); // you have [0,23] games
-		//String gameInfo = game.toString();
 		this.game=game;
+		//System.out.println(this.game);
 		String g = game.getGraph();
 		DGraph gg = new DGraph();
 		gg.init(g);
-		this.DG = gg;
+		this.DG=gg;
 		this.GG = DG;
-		this.GA = new Graph_Algo(GG);
+		this.GA = new Graph_Algo(GG);;
 
 		initGUI(this.DG);
 		FruitInit(game);
-		RobotInit(game); // read from JSONfile, build robots and add them to RobotsList. 
+		RobotInit(game);
+
+		ourT.start();
+
+		//this.run();
+
+		//this.run();
+		// read from JSONfile, build robots and add them to RobotsList. 
 		//RunGameT PlaySolo = new RunGameT();
 		//PlaySolo.SetGame(game);
 		//Thread t = new Thread(PlaySolo);
@@ -551,11 +573,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		//		while(game.isRunning()) {
 		//			ManualPlay(game);
 		//		}
-		String results = game.toString();
 
-		this.game=game;
-		System.out.println("Game Over: "+results);
-		repaint();
 	}
 
 
@@ -639,7 +657,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		}
 	}
 
-	
+
 	/**
 	 * a very simple random walk implementation!
 	 * @param g
@@ -680,35 +698,13 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	}
 
 
-	public void ManualPlay(game_service game){
-
-		List<String> log = game.move();
-		int destMove=-1;
-		if(log != null)
-		{
-			if(currentRobot.getDest() != null) {
-				destMove = currentRobot.getDest().getKey();
-			}
-			if(destMove!= -1) {
-
-				if(currentRobot!= null) {
-					game.chooseNextEdge(currentRobot.getSrc().getKey(), destMove);
-					game.move();
-					//repaint();
-				}
-			}
-		}
-	}
-
-
-
-	private int ManuelNext(game_service game){
-		int dest=0;
-		return dest;
-	}
-
-
-
+	//	public void ManualPlay(game_service game, Robot CR){
+	//		if(currentRobot!= null) {
+	//			game.chooseNextEdge(CR.getId(), CR.getDest().getKey());
+	//			game.move();
+	//
+	//		}
+	//	}
 
 	/**
 	 * 
@@ -849,7 +845,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 
 
 	private int src = -1;
-	private int dest = -1;
+	//private int dest = -1;
 	private boolean waiting ;
 	private boolean click2 ;
 	private boolean isAlreadyOneClick;
@@ -866,13 +862,14 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		{
 			click2 = true;
 			isAlreadyOneClick = false;
-			dest = clickTwice(currentRobot, p,currentRobot.getSrc().getKey());
+			clickTwice(currentRobot, p ,currentRobot.getSrc().getKey());
 		} 
 		else
 		{
 			isAlreadyOneClick = true;
 			waiting = true;
 			Timer t = new Timer("doubleclickTimer", false);
+
 			t.schedule(new TimerTask() {
 
 				@Override
@@ -889,29 +886,34 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 
 
 	public Robot clickOnce(Robot currentRobot,Point3D p){
-
-		currentRobot = FindClosestRobot (p);
-		int tempsrc = FindClosestSrc(p);
-		node_data temp = new Node();
-		temp = DG.NodeMap.get(tempsrc);
-		currentRobot.setSrc(temp);
-		System.out.println();
-		System.out.println(" 111111 Current Robot close to Node "+tempsrc);
-		System.out.println();
-		//repaint();
-
+		if (!Auto && this.game.isRunning()) {
+			currentRobot = FindClosestRobot (p);
+			int tempsrc = FindClosestSrc(p);
+			node_data temp = new Node();
+			temp = DG.NodeMap.get(tempsrc);
+			currentRobot.setSrc(temp);
+			
+		}
 		return currentRobot;
 	}
 
 
-	public int clickTwice(Robot currentRobot,Point3D p,int src){
-
-		int dest = FindClosestDest (src,p);
-		currentRobot.setDest(DG.getNode(dest));
-		System.out.println(" 222222 Current Robot dest is Node "+dest);
-		System.out.println();
-		//repaint();
-		return dest;
+	public void clickTwice(Robot currentRobot,Point3D p,int src){
+		if (!Auto && this.game.isRunning()) {
+			if(currentRobot != null) {
+				int dest = FindClosestDest(src,p);
+				currentRobot.setDest(DG.NodeMap.get(dest));
+				if(!currentRobot.moving) {
+				this.game.chooseNextEdge(currentRobot.getId(),dest);
+				this.game.move();
+				currentRobot.moving = true;
+				}
+				if(currentRobot.getPos()==currentRobot.getDest().getLocation())currentRobot.moving = false;
+				//System.out.println("After setting dest to robot : "+currentRobot.getDest().getKey());
+				//ManualPlay(this.game,currentRobot);
+			
+			}
+		}
 	}
 
 	@Override
@@ -960,11 +962,14 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 
 	public static void main(String[] args) {
 
-		//		MyGameGUI Test =  new MyGameGUI();
-		//		Test.setVisible(true);
+		MyGameGUI Test =  new MyGameGUI();
+		Test.setVisible(true);
+
+
 	}
 
 	public void reDraw () {
+		
 		this.removeAll();
 		this.getGraphics().clearRect(LastRobotX, LastRobotY, 22, 22);
 		super.paint(this.getGraphics());
@@ -984,6 +989,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 				Robot r = new Robot();
 				r.RobotFromJSON(s);
 				RobotsList.add(r);
+		
 			}
 		}
 		catch (Exception e) {e.printStackTrace();}
@@ -992,14 +998,33 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 
 	@Override
 	public void run() {
+
+
+		int dt = 100;
+
 		if(this.game!=null) {
 			this.game.startGame();
-			while(game.isRunning()) {
 
-				FruitInit(this.game);
-				UpdateRobots(this.game);
-				MoveAutoGame(this.game);
-				reDraw();
+			while(game.isRunning()) {
+				if (this.Auto) {
+					game.move();
+					FruitInit(this.game);
+					UpdateRobots(this.game);
+					MoveAutoGame(this.game);
+					reDraw();
+				}
+				else {
+					try {
+						game.move();
+						FruitInit(this.game);
+						UpdateRobots(this.game);
+						reDraw();
+						//repaint();
+						Thread.sleep(dt);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
 			}
 			System.out.println(game.toString());
 		}
