@@ -1026,7 +1026,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 				}
 			}, 400);
 		}
-		//e.notifyAll();
+		
 	}
 
 
@@ -1058,45 +1058,6 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 
 
 
-	//	public static void StartCustom(game_service game)
-	//	{
-	//		game.startGame();
-	//		//ThreadPaint(game);
-	//		//ThreadMouse(game);
-	//		while(game.isRunning()) {
-	//			//initGUI();
-	//			System.out.println("Game Is Running");
-	//			ManualPlay(game);
-	//		}
-	//		String results = game.toString();
-	//		System.out.println("Game Over: "+results);
-	//
-	//
-	//	}
-
-
-
-	//	public static void ManualPlay(game_service game){
-	//
-	//		List<String> log = game.move();
-	//		int destMove=-1;
-	//		if(log != null)
-	//		{
-	//			
-	//		
-	//			if(currentRobot.getDest() != null) {
-	//				 destMove = currentRobot.getDest().getKey();
-	//			}
-	//			if(destMove!= -1) {
-	//
-	//				if(currentRobot!= null) {
-	//					game.chooseNextEdge(currentRobot.getSrc().getKey(), destMove);
-	//					game.move();
-	//					//repaint();
-	//				}
-	//			}
-	//		}
-	//	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
@@ -1162,6 +1123,43 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 
 	public void reDraw () {
 		
+		
+
+		if(this.DG != null) {
+			Collection<node_data> Vertexes = DG.getV();
+			for(node_data node_data: Vertexes) {
+
+				Point3D TempPoint = node_data.getLocation();
+				this.getGraphics().setColor(Color.RED); 
+				int x0 = (int) scale(TempPoint.x(), min_x, max_x , 50 , this.getHeight()-50);
+				int y0 = (int) scale(TempPoint.y() ,max_y, min_y, 70 , this.getWidth()-70);	
+
+				this.getGraphics().fillOval(x0-6, y0-4, 10, 10);	
+				this.getGraphics().drawString(Integer.toString(node_data.getKey()), x0-6, y0+20);
+				Collection<edge_data> Edge = DG.getE(node_data.getKey());
+
+				for(edge_data edge_data: Edge) {	
+					this.getGraphics().setColor(Color.DARK_GRAY);
+
+					node_data dest = DG.getNode(edge_data.getDest());
+					Point3D TempPoint2 = dest.getLocation();
+					int x1 = (int) scale(TempPoint2.x(), min_x, max_x , 50 , this.getWidth()-50);
+					int y1 = (int) scale(TempPoint2.y(),max_y, min_y , 70 , this.getHeight()-70);
+
+					if (TempPoint2 != null) {
+						this.getGraphics().drawLine(x0, y0, x1, y1);
+						this.getGraphics().drawString(Double.toString(edge_data.getWeight()),((((x0+x1)/2)+x1)/2) , ((((y0+y1)/2)+y1)/2));
+						this.getGraphics().setColor(Color.GREEN);
+						int XFrame =((((((x0+x1)/2)+x1)/2)+x1)/2);
+						int YFrame = ((((((y0+y1)/2)+y1)/2)+y1)/2);
+						this.getGraphics().fillOval(XFrame, YFrame, 7, 7);	
+					}
+				}
+			}
+		}
+		
+		
+		
 		if(RobotsList!= null){
 			for(Robot r : RobotsList) {
 
@@ -1216,12 +1214,6 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		RobotInitAuto(game);
 		MoveAutoGame(game);
 		reDraw();
-	//	paintComponents(this.getGraphics());
-//		this.setComponentZOrder(this.repaint(), 0);
-		//revalidate();
-//		Graphics g = getGraphics();
-//		if (g != null) paintComponent(g);
-//		else repaint();
 		
 		
 		}
