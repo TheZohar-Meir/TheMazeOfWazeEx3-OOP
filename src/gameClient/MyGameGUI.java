@@ -1,43 +1,32 @@
 package gameClient;
 
-import java.awt.Toolkit; 
 import utils.Point3D;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.Menu;
 import java.awt.MenuBar;
 import java.awt.MenuItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import javax.imageio.ImageIO;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.sun.xml.internal.bind.WhiteSpaceProcessor;
-
 import dataStructure.DGraph;
 import dataStructure.Edge;
 import dataStructure.edge_data;
@@ -49,7 +38,6 @@ import dataStructure.Robot;
 import gui.GraphRefresher;
 import Server.Game_Server;
 import Server.game_service;
-import Threads.RunGameT;
 import algorithms.Graph_Algo; 
 
 public class MyGameGUI extends JFrame implements ActionListener , Serializable,  GraphRefresher, MouseListener, Runnable{
@@ -75,7 +63,9 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	BufferedImage myImage;
 	private boolean Auto=false;
 	private Thread ourT;
-	//Graphics myG;
+	KML k;
+	Thread t;
+	int numOfSenerio = 0;
 
 	public MyGameGUI() {
 		DG=null;
@@ -102,7 +92,12 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setResizable(false);
 		this.setVisible(true);
-
+		
+		if(DG != null)
+		{
+		k=new KML(DG);
+		k.BuildGraph();
+		}
 		MenuBar menuBar = new MenuBar();
 		Menu menu = new Menu("Menu");
 		menuBar.add(menu);
@@ -121,17 +116,12 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		menu.add(item4);	
 
 		ourT=new Thread(this);
-
 	}
 
 
 	/**
 	 * 
 	 */
-	
-	
-	
-	
 	public void paint(Graphics g) {
 
 		super.paint(g);	
@@ -139,9 +129,8 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		//Image img = Toolkit.getDefaultToolkit().getImage(MyGameGUI.class.getResource("/gameClient/game.png"));  
 		//g.drawImage(img, 0, 0, this.getWidth(), this.getHeight(), this);  
 		paintGraph(g);
-
-		g=paintRobot(g);
-		g=paintFruit(g);
+		paintRobot(g);
+		paintFruit(g);
 		//update(g);
 		//paintAll(myG);
 	}
@@ -152,8 +141,8 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		if(RobotsList!= null){
 			for(Robot r : RobotsList) {
 				Point3D p = r.getPos();
-				 try {
-					 
+				try 
+				{ 
 				BufferedImage Robot_image = ImageIO.read(new File("data/RobotImage.jpg"));
 				int x = (int) scale(p.x(), min_x, max_x , 50 , this.getWidth()-50);
 				int y = (int) scale(p.y(), max_y, min_y , 70 , this.getHeight()-70);
@@ -162,15 +151,9 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 				this.LastRobotY = y-8;
 				g.drawImage(Robot_image, x-12, y-8, null);
 				
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				} catch (IOException e) {e.printStackTrace();}
 				
 				//g.setColor(Color.BLACK);
-				
-				
-
 				//g.drawRoundRect(x-12, y-8, 20, 20, 150, 150);
 				//	g.drawRect(x-12, y-8, 20, 20);
 				//g.fillOval(x-12, y-8, 20, 20);
@@ -341,8 +324,9 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	 * 
 	 */
 	private void CreateAuto() throws InterruptedException {
-
-		this.clear();
+		
+		numOfSenerio = 0;
+		clear();
 		this.Auto=true;
 		String user_input = JOptionPane.showInputDialog(null, "Please enter your scenario number ([0,23]) ");
 		int scenario_num = Integer.parseInt(user_input) ;
@@ -351,7 +335,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 			user_input = JOptionPane.showInputDialog(null,"Please Enter a value between 0-23 ");
 			scenario_num = Integer.parseInt(user_input) ;
 		}
-
+		numOfSenerio = scenario_num;
 
 		game_service game = Game_Server.getServer(scenario_num); // you have [0,23] games
 		this.game=game;
@@ -375,9 +359,6 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		//		Thread t = new Thread(PlaySolo);
 		//		t.start();
 		//repaint();
-
-
-
 		ourT.start();
 	}
 
@@ -510,7 +491,6 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		Point3D Fpoint = f.getPos();
 		Point3D TeMpoint = new Point3D(scale(Fpoint.x(), min_x, max_x , 50 , this.getWidth()-50),scale(Fpoint.y(),max_y, min_y , 70 , this.getHeight()-70));
 
-
 		Collection<node_data> Nodes = DG.getV();
 
 		for (node_data tempNode : Nodes ) {
@@ -544,7 +524,8 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	 */
 	private void CreateCustom() {
 
-		this.clear();
+		numOfSenerio = 0;
+		clear();
 		this.Auto=false;
 		String user_input = JOptionPane.showInputDialog(null, "Please enter your scenario number ([0,23]) ");
 		int scenario_num = Integer.parseInt(user_input) ;
@@ -553,10 +534,9 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 			user_input = JOptionPane.showInputDialog(null,"Please Enter a value between 0-23 ");
 			scenario_num = Integer.parseInt(user_input) ;
 		}
-
+		numOfSenerio = scenario_num;
 		game_service game = Game_Server.getServer(scenario_num); // you have [0,23] games
 		this.game=game;
-		//System.out.println(this.game);
 		String g = game.getGraph();
 		DGraph gg = new DGraph();
 		gg.init(g);
@@ -567,37 +547,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		initGUI(this.DG);
 		FruitInit(game);
 		RobotInit(game);
-
 		ourT.start();
-
-		//this.run();
-
-		//this.run();
-		// read from JSONfile, build robots and add them to RobotsList. 
-		//RunGameT PlaySolo = new RunGameT();
-		//PlaySolo.SetGame(game);
-		//Thread t = new Thread(PlaySolo);
-		//t.run();
-
-		//RunGameT.StartCustom(game);
-		//game.startGame();
-		//t.run();
-		//t.start();
-		//		try {
-		//			Thread.sleep(1000);
-		//			System.out.println("Im sleeping");
-		//		} catch (InterruptedException e) {
-		//		
-		//			e.printStackTrace();
-		//		}
-		//repaint();
-		//Thread  RunGame = new Thread() ;
-		//game.startGame();
-		//should be a Thread!!!
-		//		while(game.isRunning()) {
-		//			ManualPlay(game);
-		//		}
-
 	}
 
 
@@ -701,26 +651,26 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		return ans;
 	}
 
-	/**
-	 * 
-	 * @param graph
-	 */
-	private void FindMinMax (graph graph) {
-
-		Collection<node_data> GraphNodes = graph.getV();
-		for (node_data MyNode : GraphNodes) {
-			Point3D p = MyNode.getLocation();
-			if(p.x() < min_x) min_x = p.x();
-			if(p.x() > max_x)max_x = p.x();
-			if(p.y() > max_y)max_y = p.y();
-			if(p.y() < min_y)min_y = p.y();
-		}
-		//		System.out.println(min_x);
-		//		System.out.println(max_x);
-		//		System.out.println(max_y);
-		//		System.out.println(min_y);
-	}
-
+//	/**
+//	 * 
+//	 * @param graph
+//	 */
+//	private void FindMinMax (graph graph) {
+//
+//		Collection<node_data> GraphNodes = graph.getV();
+//		for (node_data MyNode : GraphNodes) {
+//			Point3D p = MyNode.getLocation();
+//			if(p.x() < min_x) min_x = p.x();
+//			if(p.x() > max_x)max_x = p.x();
+//			if(p.y() > max_y)max_y = p.y();
+//			if(p.y() < min_y)min_y = p.y();
+//		}
+//		//		System.out.println(min_x);
+//		//		System.out.println(max_x);
+//		//		System.out.println(max_y);
+//		//		System.out.println(min_y);
+//	}
+//
 
 	//	public void ManualPlay(game_service game, Robot CR){
 	//		if(currentRobot!= null) {
@@ -985,11 +935,8 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	}
 
 	public static void main(String[] args) {
-
 		MyGameGUI Test =  new MyGameGUI();
 		Test.setVisible(true);
-
-
 	}
 
 	public void reDraw () {
@@ -1029,8 +976,11 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 
 		if(this.game!=null) {
 			this.game.startGame();
-
+			k.setGame(game);
+			ThreadKML();
+			
 			while(game.isRunning()) {
+				System.out.println("Local thread working $$$$$$");
 				if (this.Auto) {
 					
 					try {
@@ -1064,8 +1014,45 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 				}
 			}
 			System.out.println(game.toString());
+			k.saveToFile(""+numOfSenerio,game.toString());
 		}
 	}
+	
+	
+	public void ThreadKML()
+	{
+		
+		t = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				
+				while(game.isRunning())
+				{
+					System.out.println("KML Loger working ######");
+					if(DG!=null)
+					{
+						try {
+							long timeToSleep = 100;
+							Thread.sleep(timeToSleep);
+							String Starttime  = java.time.LocalDate.now()+"T"+java.time.LocalTime.now();
+							LocalTime test = LocalTime.now();
+							//test = test.plusSeconds(timeToSleep/1000);
+							test= test.plusNanos(timeToSleep*1000000);
+							String endTime = java.time.LocalDate.now()+"T"+test;
+							k.setFruits(Starttime,endTime);
+							k.setBots(Starttime,endTime);
+						}
+						catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
+				t.interrupt();
+			}
+		});
+		t.start();
+	}
+	
 
 
 }
