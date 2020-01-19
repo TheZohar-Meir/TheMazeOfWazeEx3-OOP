@@ -30,7 +30,7 @@ for example to get a spesific edge we will search this edge inside the Nodes Has
 
 There is also a class Named Graph_Algo that suppourts someo actions such as "Is Connected" - checks if a graph is Strongly Connected , "Shortest Path" return the shortest path between two vertices, "TSP" that returns the Thrill Shorted Path between input nodes.
 
-* In general this projcet is an extendtion of [our last project](https://github.com/lidorT/Ex1---OOP/wiki/Complex-Function) but here you can also use the graphs in order to display a game.
+* In general this projcet is an extendtion of [our last project](https://github.com/lidorT/OOP---Ex2) but here you can also use the graphs in order to display a game.
 
 * In the game there are Robots that collect fruits, there are two kinds of fruits, one can be gattered from higher Vertex to a lower and the other one is the opposite (for ex : picking up a yellow fruit can only be from vertex 9 to 8 , a pink one can be picked from 8 to 9).
 
