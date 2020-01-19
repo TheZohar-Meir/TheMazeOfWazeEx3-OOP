@@ -4,6 +4,10 @@
 
 #### This project gives the ability to play a Game with two modes, Auto mode and Custome mode.
 
+#### The Idea of the game is to collect fruits , while playing a manual game , 1 click on a rbobot will select it and double click to a vertex will send the robot to that vertex.
+
+#### Notice that there are two kinds of "fruits" and a specific way to collect each one, for more information please visit our Wiki section.
+
 #### This project was wrriten by Zohar Meir & Lidor Tal during our Object Oriented Programming course at Ariel University with the guidance of Professor Boaz Ben Moshe all rights reserved to us ©.
 
 #### This project contains an stdDraw interface which was created by Robert Sedgewick and Kevin Wayne for future use ©.
@@ -38,4 +42,4 @@ There is also a class Named Graph_Algo that suppourts someo actions such as "Is 
 
 example of the plot :
 
-![ExampleOfPlot](https://i.imgur.com/MHRUO91.jpg)
+![ExampleOfPlot](https://i.imgur.com/nKOK7XQ.jpg)
