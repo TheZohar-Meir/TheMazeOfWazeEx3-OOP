@@ -1,254 +1,182 @@
 package gameClient;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Hashtable;
-import java.util.List;
-import org.json.JSONObject;
-import dataStructure.edge_data;
-import dataStructure.graph;
-import dataStructure.node_data;
-import Server.game_service;
-import de.micromata.opengis.kml.v_2_2_0.Data;
-import de.micromata.opengis.kml.v_2_2_0.Document;
-import de.micromata.opengis.kml.v_2_2_0.ExtendedData;
-import de.micromata.opengis.kml.v_2_2_0.Feature;
-import de.micromata.opengis.kml.v_2_2_0.Folder;
-import de.micromata.opengis.kml.v_2_2_0.Geometry;
-import de.micromata.opengis.kml.v_2_2_0.Icon;
-import de.micromata.opengis.kml.v_2_2_0.Kml;
-import de.micromata.opengis.kml.v_2_2_0.LineString;
-import de.micromata.opengis.kml.v_2_2_0.NetworkLink;
-import de.micromata.opengis.kml.v_2_2_0.Placemark;
-import de.micromata.opengis.kml.v_2_2_0.Style;
-import de.micromata.opengis.kml.v_2_2_0.TimeStamp;
-import utils.Point3D;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDateTime;
 
-public class KML {
-
-	game_service game;
-	graph g;
-	Kml k;
-	Document doc;
-
-	public KML(graph g) {
-		this.g = g;
-	}
+/**
+ * # KML
+#### * This class create a new KML file for our game.
+#### * After creating this file we save it in our project KML_Auto_Scenario folder double clicking it will lunch GoogleEarth and display the movement of our robots and graphs for each level you played. 
+#### * © authors: Zohar and Lidor.
+ */
+public class KML
+{
+	private static int Current_time;
 	
-	
-	public void setGame(game_service game)
+	/**
+	 * This class create a new KML file for our game.
+	 * @param recivedName - receive the file name.
+	 * @param Senerio_number - the number of the scenario.
+	 * @return a string that represent the file name.
+	 * */
+	public static String CreatNewKMLFile(String recivedName, int Senerio_number)
 	{
-		this.game = game;
-	}
-	
-	
-	public void BuildGraph()
-	{
-		k = new Kml();
-		doc = k.createAndSetDocument().withName("KML").withOpen(true);
-		Folder folder = doc.createAndAddFolder();
-		folder.withName("Folder").withOpen(true);
-
-
-		Icon icon = new Icon().withHref("http://maps.google.com/mapfiles/kml/shapes/parking_lot.png");
-		Style placeMarkStyle = doc.createAndAddStyle();
-		placeMarkStyle.withId("placemarkid").createAndSetIconStyle().withIcon(icon).withScale(1.2);
-
-		Collection<node_data> nd = g.getV();
-		for (node_data node_data : nd) {
-			//createPlacemarkWithChart(doc, folder, node_data.getLocation().x(), node_data.getLocation().y(), node_data.getKey()+"", 20);
-			Placemark p = doc.createAndAddPlacemark();
-			p.withName(node_data.getKey()+"");
-			p.withStyleUrl("#placemarkid");
-			p.createAndSetPoint().addToCoordinates(node_data.getLocation().x(), node_data.getLocation().y());
-
-			Style redStyle= doc.createAndAddStyle();
-			redStyle.withId("redstyle").createAndSetLineStyle().withColor("ff0000ff").setWidth(3.0);;
-			Collection<edge_data> ed = g.getE(node_data.getKey());
-			for (edge_data edgess : ed) {
-				Placemark p2 = doc.createAndAddPlacemark();
-				p2.withStyleUrl("#redstyle");
-
-				Point3D loc  =g.getNode(edgess.getSrc()).getLocation();
-				Point3D locNext = g.getNode(edgess.getDest()).getLocation();
-
-				p2.createAndSetLineString().withTessellate(true).addToCoordinates(loc.x(),loc.y()).addToCoordinates(locNext.x(),locNext.y());
-			}
+		if(Senerio_number % 2 == 1) {
+			Current_time = 60000;
 		}
-		//		saveToFile("test1");
-	}
-	
-	
-	
-	public void saveToFile(String nameS,String resault)
-	{
-		try {
-
-			int prevGrade = 0;
-			int prevMoves = 0;
-			File tmpDir = new File("data/"+nameS+".kml");
-			boolean exists = tmpDir.exists();
-			if(exists)
-			{
-				Kml prevKml = Kml.unmarshal(tmpDir);
-				// 	prevKml.unmarshal(new File("data/"+nameS+".kml"));
-				//Document docTest = prevKml.
-				Feature feat = prevKml.getFeature();
-
-				Hashtable<String, Integer> ans = reader(feat);
-				prevGrade = ans.get("grade");
-				prevMoves = ans.get("moves");
-
-				JSONObject obj = new JSONObject(resault);
-				JSONObject CurrRes = (JSONObject) obj.get("GameServer");
-				int grade = CurrRes.getInt("grade");
-				int moves = CurrRes.getInt("moves");
-				ExtendedData ed = doc.createAndSetExtendedData();
-				ed.createAndAddData(grade+"").setName("grade");
-				ed.createAndAddData(moves+"").setName("moves");
-
-
-
-
-				if(grade>prevGrade)
-				{
-					System.out.println("grade:"+grade + " prev grade :"+prevGrade);
-					k.marshal(tmpDir);
-				}
-				else
-				{
-					if(moves<prevMoves)
-					{
-						System.out.println("Moves " + moves + " prev moves" + prevMoves);
-						k.marshal(tmpDir);
-					}
-				}
-			}
-			else {
-				JSONObject obj = new JSONObject(resault);
-				JSONObject CurrRes = (JSONObject) obj.get("GameServer");
-				int grade = CurrRes.getInt("grade");
-				int moves = CurrRes.getInt("moves");
-				ExtendedData ed = doc.createAndSetExtendedData();
-				ed.createAndAddData(grade+"").setName("grade");
-				ed.createAndAddData(moves+"").setName("moves");
-				k.marshal(tmpDir);
-			}
+		else {
+			Current_time = 30000;
 		}
-		catch (Exception e) {
-			e.printStackTrace();		}
-	}
-
-	public void setFruits(String time,String end)
-	{
-		//Placemark p = doc.createAndAddPlacemark();
-		//ArrayList<Placemark> currP = new ArrayList<Placemark>();
-		Icon iconGreen = new Icon().withHref("http://maps.google.com/mapfiles/kml/paddle/grn-stars.png");
-		Style greenStyle = doc.createAndAddStyle();
-		greenStyle.withId("greenI").createAndSetIconStyle().withIcon(iconGreen).withScale(1.2);
-		Icon iconYellow = new Icon().withHref("http://maps.google.com/mapfiles/kml/paddle/ylw-stars.png");
-		Style yelloStyle = doc.createAndAddStyle();
-		yelloStyle.withId("yellowI").createAndSetIconStyle().withIcon(iconYellow).withScale(1.2);
-
-		Icon testRmove = new Icon().withHref("http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png");
-		Style removeStyle = doc.createAndAddStyle();
-		removeStyle.withId("removeS").createAndSetIconStyle().withIcon(testRmove).withScale(0.0);
-		List<String> frus = game.getFruits();
-		for (String json : frus) {
-			try {
-				JSONObject obj = new JSONObject(json);
-				//			JSONArray fruits = obj.getJSONArray("Fruit");
-				//			for (int i = 0; i < fruits.length(); i++)
-				//			{
-				//				JSONObject CurrFruit = (JSONObject)fruits.get(i);
-				JSONObject CurrFruit = (JSONObject) obj.get("Fruit");
-				String pos = CurrFruit.getString("pos");
-				String[] arr = pos.split(",");
-				double x = Double.parseDouble(arr[0]);
-				double y = Double.parseDouble(arr[1]);
-				double z = Double.parseDouble(arr[2]);
-				Point3D p = new Point3D(x, y, z);
-				int type = CurrFruit.getInt("type");
-
-				Placemark fr = doc.createAndAddPlacemark();
-				//			fr.withName("fru");
-				if(type == -1)
-				{
-					fr.setStyleUrl("#greenI");
-				}
-				else
-				{
-					fr.setStyleUrl("#yellowI");
-				}
-				fr.createAndSetPoint().addToCoordinates(x, y);
-//				fr.createAndSetTimeStamp().withWhen(time);
-				fr.createAndSetTimeSpan().withBegin(time).withEnd(end);
-				//fr.createAndSetTimeSpan().setEnd(time);
-				//	fr.setVisibility(false);
-			}
-
-			catch (Exception e) {
-				// TODO: handle exception
-				e.printStackTrace();
-			}
-		}
-	}
-	public void setBots(String time,String end)
-	{	
-		Icon BusIcon = new Icon().withHref("http://maps.google.com/mapfiles/kml/shapes/bus.png");
-		Style busStyle = doc.createAndAddStyle();
-		busStyle.withId("Bus").createAndSetIconStyle().withIcon(BusIcon).withScale(1.2);
-		List<String> robos = game.getRobots();
-		for (String string : robos) {
-			try {
-				JSONObject obj = new JSONObject(string);
-				JSONObject CurrBot = (JSONObject) obj.get("Robot");
-				String pos = CurrBot.getString("pos");
-				String[] arr = pos.split(",");
-				double x = Double.parseDouble(arr[0]);
-				double y = Double.parseDouble(arr[1]);
-				double z = Double.parseDouble(arr[2]);
-				Point3D posP = new Point3D(x, y, z);
-				int id = CurrBot.getInt("id");
-				Placemark bot = doc.createAndAddPlacemark();
-				bot.setStyleUrl("#Bus");
-				bot.createAndSetPoint().addToCoordinates(x, y);
-				//bot.createAndSetTimeStamp().withWhen(time);
-				bot.createAndSetTimeSpan().withBegin(time).withEnd(end);
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}	
-		}
-	}
-	private Hashtable<String, Integer> reader(Feature feat)
-	{
-		//ArrayList<Integer> ans = new ArrayList<Integer>();
-		Hashtable<String, Integer> ans = new Hashtable<String, Integer>();
-		System.out.println("Test1");
-		if(feat!=null)
+		File file = new File(recivedName);
+		if(!file.exists())
 		{
-			System.out.println("Test2");
-			if(feat instanceof Document)
+			System.out.println("file Name: "+recivedName);
+			String output = "";
+			try 
 			{
-				System.out.println("Test3");
-				Document document = (Document) feat;
-				ExtendedData  dd = document.getExtendedData();
-				if(dd!=null)
-				{
-					List<Data> ld = dd.getData();
-					for (Data data : ld) {
-						// System.out.println(data.getName()+" :" + data.getValue());
-						ans.put(data.getName(), Integer.parseInt(data.getValue()));
-					}
-				}
-
-			}
+				file.createNewFile();
+				BufferedWriter br = new BufferedWriter(new FileWriter(file));
+				
+				//First 3 lines
+				output += "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"; 
+				output += "<kml xmlns=\"http://www.opengis.net/kml/2.2\">\r\n";
+				output += "<Document>\r\n";
+				
+				//Fruit1
+				output += "<Style id=\"Fruit1\">\r\n";
+				output += "<Icon>\r\n";
+				output += "<href>https://i.imgur.com/xh6wLVK.png</href>\r\n";
+				output += "</Icon>\r\n";	
+				output += "</Style>\r\n";
+				
+				//Fruit2
+				output += "<Style id=\"Fruit2\">\r\n";
+				output += "<Icon>\r\n";
+				output += "<href>https://i.imgur.com/9fW4PkQ.png</href>\r\n";
+				output += "</Icon>\r\n";	
+				output += "</Style>\r\n";
+				
+				//Robot
+				output += "<Style id=\"Robot\">\r\n";
+				output += "<Icon>\r\n";
+				output += "<href>https://i.imgur.com/0QBAYfL.png</href>\r\n";
+				output += "</Icon>\r\n";	
+				output += "</Style>\r\n\r\n";
+				
+				br.write(output);
+				br.close();
+			} 
+			catch (IOException e) {e.printStackTrace();}
+			return recivedName;
 		}
-		return ans;
+		else
+		{
+			int i = recivedName.indexOf(".");
+			System.out.println("You already have a file with the same name.");
+			return CreatNewKMLFile(recivedName.substring(0, i) + i + ".kml",Senerio_number);
+		}
+	}
+	
+	
+	/**
+	 * This function writes to an existing KML file.
+	 * @param recivedName - receive the file name.
+	 * @param x - Object x value.
+	 * @param y - Object y value.
+	 * @param Object_type - the written object type: in order to give specific icon to every type of object.
+	 * @param timeToEnd - helps to write the correct timeSpan for this object.
+	 * @throws FileNotFoundException - if "recivedName" does not exists
+	 * */
+	public static void Write_Data(String recivedName, double x, double y, String Object_type, long TimeToEnd)throws FileNotFoundException
+	{
+		long  time = (Current_time - TimeToEnd)/1000;
+		String output = "";
+		File f = new File(recivedName);
+		if(!f.exists())
+			throw new FileNotFoundException("Error this file does not exist...");
+		try 
+		{
+			BufferedWriter br = new BufferedWriter(new FileWriter(recivedName,true));
+			
+			output += "<Placemark>\r\n";
+			output += "<name>" + Object_type + "</name>\r\n";
+			output += "<TimeSpan>\r\n<begin>" + time + "Z</begin>\r\n<end>" + (time+0.1) + "</end>\r\n</TimeSpan>\r\n";
+			switch(Object_type)
+			{
+			case "Fruit1":
+			{
+				output += "<styleUrl>#Fruit1</styleUrl>\r\n";
+				break;
+			}
+			case "Fruit2":
+			{
+				output += "<styleUrl>#Fruit2</styleUrl>\r\n";
+				break;
+			}
+			case "Robot":
+			{
+				output += "<styleUrl>#Robot</styleUrl>\r\n";
+				break;
+			}
+			}
+			output += "<TimeStamp>\r\n<when>"+LocalDateTime.now()+"Z</when>\r\n</TimeStamp>\r\n";
+			output += "<Point>\r\n";
+			output += "<coordinates>"+ x + ", " + y + ", 0</coordinates>\r\n</Point>\r\n";
+			output += "</Placemark>\r\n\r\n";
+			br.write(output);
+			br.close();
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+		}
 	}
 
-
+	
+	
+	/**
+	 * This function close the file "recivedName" as KML file.
+	 * @param recivedName - To know which KML file to close.
+	 * @throws IOException if file "recivedName" does not start with the proper KML file deceleration.
+	 * */
+	public static void close_KML(String recivedName) throws IOException 
+	{
+		File f = new File(recivedName);
+		if(!f.exists())
+			throw new FileNotFoundException("error this file does not exist!");
+		BufferedReader br = new BufferedReader(new FileReader(f));
+		String s = br.readLine();
+		if(!s.equals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"))
+		{
+			br.close();
+			throw new IOException("wrong file format ");
+		}
+		s = br.readLine();
+		if(!s.equals("<kml xmlns=\"http://www.opengis.net/kml/2.2\">"))
+		{
+			br.close();
+			throw new IOException("wrong file format ");
+		}
+		s = br.readLine();
+		if(!s.equals("<Document>"))
+		{
+			br.close();
+			throw new IOException("wrong file format ");
+		}
+		br.close();
+		BufferedWriter bw = new BufferedWriter(new FileWriter(recivedName,true));
+		String output = "";
+		output += "</Document>\r\n";
+		//		out += "</Folder>\r\n";
+		output += "</kml>";
+		bw.write(output);
+		bw.close();
+		f.setWritable(false);
+	}
 }
