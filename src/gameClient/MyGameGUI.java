@@ -65,6 +65,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	private Thread ourT;
 	KML k;
 	Thread t;
+	
 	int numOfSenerio = 0;
 
 	public MyGameGUI() {
