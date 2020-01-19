@@ -8,6 +8,8 @@
 
 #### Notice that there are two kinds of "fruits" and a specific way to collect each one, for more information please visit our Wiki section.
 
+#### At the begining of the game you will be asked if you would like to export a KML file if you prees yes you will be able to run this KML file and watch the robots and fruits coordinates at google earth
+
 #### This project was wrriten by Zohar Meir & Lidor Tal during our Object Oriented Programming course at Ariel University with the guidance of Professor Boaz Ben Moshe all rights reserved to us ©.
 
 #### This project contains an stdDraw interface which was created by Robert Sedgewick and Kevin Wayne for future use ©.
