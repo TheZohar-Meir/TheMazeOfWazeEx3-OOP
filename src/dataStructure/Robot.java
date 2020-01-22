@@ -1,5 +1,7 @@
 package dataStructure;
 
+import java.util.List;
+
 import org.json.JSONObject;
 import utils.Point3D;
 /**
@@ -34,11 +36,25 @@ public class Robot {
 	private int SrcId;
 	private node_data dest;
 	private edge_data edge;
-	public boolean moving = false;
+	public boolean moving;
+	public Fruit F;
+	public int firtTime;
+	public int nextVertex;
+	public List<node_data> Thrill;
+
+	
+	
+	public List<node_data> getThrill() {
+		return Thrill;
+	}
+
+	public void setThrill(List<node_data> thrill) {
+		Thrill = thrill;
+	}
 
 	/**
 	 * Default constructor, sets all values to 0 and nulls.
-	 */
+	 */ 
 	public Robot(){
 		this.id = 0;
 		this.pos = null;
@@ -46,6 +62,18 @@ public class Robot {
 		this.edge = null;
 		this.src = null;
 		this.dest=null;
+		this.F = null;
+		this.moving = false;
+		this.firtTime = 0;
+		nextVertex = -1;
+		
+	}
+	
+	public Fruit getF() {
+		return F;
+	}
+	public void setF(Fruit f) {
+		F = f;
 	}
 	/**
 	 * Specific constructor, sets all values to the input ones.
@@ -129,7 +157,7 @@ public class Robot {
 	 * @param node -  sets the destination node of the robot.
 	 */
 	public void setDest(node_data node) {
-		this.dest = node;
+		this.dest = node;	
 	}
 	/**
 	 * 

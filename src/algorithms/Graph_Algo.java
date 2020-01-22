@@ -39,6 +39,7 @@ public class Graph_Algo implements graph_algorithms,Serializable{
 		this.ga = g;
 	}
 	
+	
 	/**
 	 * Default constructor.
 	 * @param g - a graph

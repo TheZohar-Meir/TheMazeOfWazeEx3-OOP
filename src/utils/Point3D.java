@@ -18,7 +18,7 @@ public class Point3D implements Serializable
     public static final double EPS1 = 0.001, EPS2 = Math.pow(EPS1,2), EPS=EPS2;
     /**
      * This field represents the origin point:[0,0,0]
-     */
+     */ 
     public static final Point3D ORIGIN = new Point3D(0,0,0);
     ////////////////////////////////////////////
     //////////////    fields     ///////////////

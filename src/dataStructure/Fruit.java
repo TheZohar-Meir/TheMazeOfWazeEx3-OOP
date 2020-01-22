@@ -1,5 +1,8 @@
 package dataStructure;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.json.JSONObject;
 import utils.Point3D;
 /**
@@ -34,8 +37,12 @@ public class Fruit {
 	private node_data ClosestNode;
 	private int src;
 	private int dest;
-	public boolean Rot = false;  // Robot on the way
+	//public boolean Rot = false;  // Robot on the way
 	public double dist;
+	public Robot R;
+	
+
+
 
 	/**
 	 * Default constructor - sets all values to 0 and null , type to 1.
@@ -45,8 +52,9 @@ public class Fruit {
 		this.type = 1;
 		this.pos=null;
 		this.edge=null;
+		this.R = null;
 	}
-
+	
 	/**
 	 *  Specific constructor.
 	 * @param val - value of the fruit
@@ -60,6 +68,14 @@ public class Fruit {
 		this.pos = pos;
 		this.edge = edge;
 	}
+	public Robot getR() {
+		return R;
+	}
+
+	public void setR(Robot r) {
+		R = r;
+	}
+
 	/**
 	 * 
 	 * @return the key of the source node of the fruit.

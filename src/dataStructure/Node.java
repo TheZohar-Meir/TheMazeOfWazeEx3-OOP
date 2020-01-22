@@ -25,7 +25,7 @@ public class Node implements node_data,Serializable{
 	 * Default constructor - sets all values to zeros and null.
 	 */
 	public Node(){
-		
+	
 		this.key=0;
 		this.location= new Point3D(0,0,0);
 		this.weight=0;

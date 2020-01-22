@@ -34,7 +34,7 @@ public class Edge implements edge_data,Serializable{
 		this.weight=0.0;
 		this.info = null;
 	}
-	
+
 	
 	/**
 	 * an edge constructor with specific inputs.
