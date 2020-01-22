@@ -8,7 +8,6 @@
  * This class represents a simple example of using MySQL Data-Base.
  * Use this example for writing solution. 
  * @author boaz.benmoshe
- *
  */
 public class SimpleDB {
 	public static final String jdbcUrl="jdbc:mysql://db-mysql-ams3-67328-do-user-4468260-0.db.ondigitalocean.com:25060/oop?useUnicode=yes&characterEncoding=UTF-8&useSSL=false";

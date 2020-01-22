@@ -96,6 +96,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	static int numOfScenerio = 0;
 	private static String file_name_KML;
 	private static int firtTime = 0;
+	int[] dt = {40,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60};
 	KML k;
 	int moving_counter=0;
 
@@ -518,14 +519,14 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 				}
 
 				tempRob.nextVertex = tempRob.getDest().getKey();
-				System.out.println("sending the Robot to next edge ---> "+tempRob.getDest().getKey());
+				//System.out.println("sending the Robot to next edge ---> "+tempRob.getDest().getKey());
 				game.chooseNextEdge(tempRob.getId(), tempRob.getDest().getKey());
 				tempRob.setSrc(tempRob.getDest());
 				tempRob.setSrcId(tempRob.getDest().getKey());
 				tempRob.moving = true;
 				game.move();
 				moving_counter++;
-				System.out.println("moving_counter "+ moving_counter);
+				//System.out.println("moving_counter "+ moving_counter);
 			}
 		}
 	}
@@ -541,7 +542,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	public void UpdateRobots(game_service game) {
 		
 		runner++;
-		System.out.println("RRRRRRRRUNERRRRRRRR "+runner);
+		//System.out.println("RRRRRRRRUNERRRRRRRR "+runner);
 		try {
 			List<String> tempRobots = new ArrayList<String>(); 
 			tempRobots = game.getRobots();
@@ -581,12 +582,13 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 								r.setSrcId(src);
 								r.setSrc(DG.NodeMap.get(src));
 								r.firtTime++;
-								System.out.println("Sending to move the fuckimg robot #################### move move move");
+								//System.out.println("Sending to move the fuckimg robot #################### move move move");
 								MoveAutoGameSmart(this.game);
 							}
 							if(r.moving ) 
+								
 							{
-								if(runner % 2 == 0)game.move();
+								if(runner % 5 == 0)game.move();
 								if(src == r.getSrcId()) {
 									r.moving = false;
 									//r.setSrc(DG.NodeMap.get(src));
@@ -1245,8 +1247,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	public void run() {
 
 		int Manualdt = 70;
-		int Autodt = 110;
-
+		int Autodt = 10;
 		if(this.game!=null){
 
 			int answer = JOptionPane.showConfirmDialog(null, "Do you want to creat a KML file??");

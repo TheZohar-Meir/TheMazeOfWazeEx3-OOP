@@ -153,7 +153,6 @@ public class Robot {
 		return dest;
 	}
 	/**
-	 * 
 	 * @param node -  sets the destination node of the robot.
 	 */
 	public void setDest(node_data node) {

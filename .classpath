@@ -9,7 +9,7 @@
 	<classpathentry kind="lib" path="lib/java-json.jar"/>
 	<classpathentry kind="lib" path="C:/Users/user/git/TheMazeOfWazeEx3-OOP/lib/javaapiforkml-2.2.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
-	<classpathentry kind="lib" path="C:/Users/user/git/TheMazeOfWazeEx3-OOP/lib/GameServer_v0.32.jar"/>
 	<classpathentry kind="lib" path="C:/Users/user/git/TheMazeOfWazeEx3-OOP/lib/mysql-connector-java-5.1.47.jar"/>
+	<classpathentry kind="lib" path="C:/Users/user/git/TheMazeOfWazeEx3-OOP/lib/GameServer_v0.33.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

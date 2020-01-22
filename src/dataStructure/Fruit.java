@@ -41,9 +41,6 @@ public class Fruit {
 	public double dist;
 	public Robot R;
 	
-
-
-
 	/**
 	 * Default constructor - sets all values to 0 and null , type to 1.
 	 */
