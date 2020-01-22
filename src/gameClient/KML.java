@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 public class KML
 {
 	private static int Current_time;
+	static File gamePath;
 	
 	/**
 	 * This class create a new KML file for our game.
@@ -145,38 +146,44 @@ public class KML
 	 * @param recivedName - To know which KML file to close.
 	 * @throws IOException if file "recivedName" does not start with the proper KML file deceleration.
 	 * */
-	public static void close_KML(String recivedName) throws IOException 
+	public static String close_KML(String recivedName) throws IOException 
 	{
+		System.out.println("close KML file");
 		File f = new File(recivedName);
-		if(!f.exists())
-			throw new FileNotFoundException("error this file does not exist!");
+		if(!f.exists())throw new FileNotFoundException("error this file does not exist!");
 		BufferedReader br = new BufferedReader(new FileReader(f));
 		String s = br.readLine();
+		
 		if(!s.equals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"))
 		{
 			br.close();
 			throw new IOException("wrong file format ");
 		}
+		
 		s = br.readLine();
 		if(!s.equals("<kml xmlns=\"http://www.opengis.net/kml/2.2\">"))
 		{
 			br.close();
 			throw new IOException("wrong file format ");
 		}
+		
 		s = br.readLine();
 		if(!s.equals("<Document>"))
 		{
 			br.close();
 			throw new IOException("wrong file format ");
 		}
+		
 		br.close();
 		BufferedWriter bw = new BufferedWriter(new FileWriter(recivedName,true));
 		String output = "";
-		output += "</Document>\r\n";
+		output += "</KML>\r\n";
 		//		out += "</Folder>\r\n";
 		output += "</kml>";
 		bw.write(output);
 		bw.close();
 		f.setWritable(false);
+		return f.toString();
 	}
+	
 }

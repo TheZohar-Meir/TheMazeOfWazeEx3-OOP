@@ -214,6 +214,7 @@ public class Fruit {
 	public void initFruit(String g){
 
 		if(!g.isEmpty()){
+			
 			try{
 				JSONObject obj = new JSONObject(g);
 				JSONObject fruit = (JSONObject) obj.get("Fruit");
@@ -231,7 +232,6 @@ public class Fruit {
 			catch (Exception e) {
 				e.printStackTrace();
 			}
-
 		}
 	}
 }

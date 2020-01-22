@@ -104,13 +104,14 @@ public class Ex4_Client implements Runnable{
 					if(dest==-1) {			
 						dest = nextNode(gg, src);
 						game.chooseNextEdge(rid, dest);
-			//			System.out.println("Turn to node: "+dest+"  time to end:"+(t/1000));
 					}
 				} 
 				catch (JSONException e) {e.printStackTrace();}
 			}
 		}
 	}
+	
+	
 	/**
 	 * a very simple random walk implementation!
 	 * @param g

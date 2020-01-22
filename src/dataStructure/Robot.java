@@ -202,7 +202,6 @@ public class Robot {
 				this.speed = speed;
 				int src = CurrBot.getInt("src");
 				this.setSrcId(src);
-
 			}
 			catch (Exception e) {
 				e.printStackTrace();

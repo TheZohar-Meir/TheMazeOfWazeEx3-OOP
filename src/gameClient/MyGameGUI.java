@@ -96,7 +96,10 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	static int numOfScenerio = 0;
 	private static String file_name_KML;
 	private static int firtTime = 0;
-	int[] dt = {40,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60};
+	double[] dt = {30,15.15,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60};
+	double[] modolu = {4,8,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2};
+	long AutoDt;
+	double AutoMod;
 	KML k;
 	int moving_counter=0;
 
@@ -389,6 +392,10 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		repaint();
 	}
 
+	private void UpdateSpeed(int scenario) {
+		AutoDt = (long) dt[numOfScenerio];
+		AutoMod = modolu[numOfScenerio];
+	}
 
 	/**
 	 * This method Called when you prees the CreateAuto on the GUi's menu bar.
@@ -405,12 +412,16 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		String user_input = JOptionPane.showInputDialog(null, "Please enter your scenario number ([0,23]) ");
 		int scenario_num = Integer.parseInt(user_input) ;
 
-		while (scenario_num<0||scenario_num>23){
+		while (scenario_num<0||scenario_num>23)
+		{
 			if(scenario_num == -1 || scenario_num == -31 || scenario_num == -331)break;
 			user_input = JOptionPane.showInputDialog(null,"Please Enter a value between 0-23 ");
 			scenario_num = Integer.parseInt(user_input) ;
 		}
+
 		numOfScenerio = scenario_num;
+		UpdateSpeed(numOfScenerio);
+		Game_Server.login(204593222);
 		game_service game = Game_Server.getServer(scenario_num); // you have [0,23] games
 		this.game=game;
 		System.out.println(this.game);
@@ -438,59 +449,59 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	 * the game.move and chooseNextEdge commands of the server.
 	 * @param game - the running game.
 	 */
-//	public void MoveAutoGame (game_service game) {
-//
-//		Graph_Algo a = new Graph_Algo();
-//		a.init(DG);
-//		for (Robot tempRob : RobotsList) {
-//
-//			Fruit ClosestFruit = FindClosestFruit(tempRob);
-//			if(tempRob.getF() != null && ClosestFruit != tempRob.getF()) {
-//				tempRob.getF().setR(null);
-//				tempRob.setF(ClosestFruit);
-//				tempRob.getF().setR(tempRob);
-//				System.out.println("different fruit");
-//			}
-//			if(tempRob.getF() == null) {
-//				tempRob.setF(ClosestFruit);
-//				tempRob.getF().setR(tempRob);
-//			}
-//
-//			/////calculate path && move 
-//			if(ClosestFruit.R == tempRob || (tempRob.getDest().getKey() == tempRob.nextVertex)){
-//
-//				System.out.println("calculating  path ! ");
-//
-//				int arg1 = tempRob.getSrcId();
-//				int arg2 = ClosestFruit.getDest();
-//				if(arg1 == arg2) arg2 = ClosestFruit.getSrc();
-//
-//				List<node_data> lis = a.shortestPath(arg1,arg2);
-//				if(lis.size()>1)tempRob.setDest(lis.get(1));
-//				else {
-//					tempRob.setDest(lis.get(0));
-//				}
-//
-//				System.out.println("temprob.getdest   "+tempRob.getDest().getKey());
-//				System.out.println("nextVertex   "+tempRob.nextVertex);
-//
-//				if(tempRob.getDest().getKey() == tempRob.nextVertex) {
-//					if(lis.size()>2)tempRob.setDest(lis.get(2));
-//					else tempRob.nextVertex = -1;
-//				}
-//
-//				if(tempRob.getDest().getKey() != tempRob.nextVertex) {
-//
-//					System.out.println("Sending the Robot to Fruit ---> ");	
-//					tempRob.nextVertex = tempRob.getDest().getKey();
-//					game.chooseNextEdge(tempRob.getId(), tempRob.getDest().getKey());
-//					game.move();
-//					tempRob.moving = true;
-//					moving_counter++;
-//				}
-//			}
-//		}
-//	}
+	//	public void MoveAutoGame (game_service game) {
+	//
+	//		Graph_Algo a = new Graph_Algo();
+	//		a.init(DG);
+	//		for (Robot tempRob : RobotsList) {
+	//
+	//			Fruit ClosestFruit = FindClosestFruit(tempRob);
+	//			if(tempRob.getF() != null && ClosestFruit != tempRob.getF()) {
+	//				tempRob.getF().setR(null);
+	//				tempRob.setF(ClosestFruit);
+	//				tempRob.getF().setR(tempRob);
+	//				System.out.println("different fruit");
+	//			}
+	//			if(tempRob.getF() == null) {
+	//				tempRob.setF(ClosestFruit);
+	//				tempRob.getF().setR(tempRob);
+	//			}
+	//
+	//			/////calculate path && move 
+	//			if(ClosestFruit.R == tempRob || (tempRob.getDest().getKey() == tempRob.nextVertex)){
+	//
+	//				System.out.println("calculating  path ! ");
+	//
+	//				int arg1 = tempRob.getSrcId();
+	//				int arg2 = ClosestFruit.getDest();
+	//				if(arg1 == arg2) arg2 = ClosestFruit.getSrc();
+	//
+	//				List<node_data> lis = a.shortestPath(arg1,arg2);
+	//				if(lis.size()>1)tempRob.setDest(lis.get(1));
+	//				else {
+	//					tempRob.setDest(lis.get(0));
+	//				}
+	//
+	//				System.out.println("temprob.getdest   "+tempRob.getDest().getKey());
+	//				System.out.println("nextVertex   "+tempRob.nextVertex);
+	//
+	//				if(tempRob.getDest().getKey() == tempRob.nextVertex) {
+	//					if(lis.size()>2)tempRob.setDest(lis.get(2));
+	//					else tempRob.nextVertex = -1;
+	//				}
+	//
+	//				if(tempRob.getDest().getKey() != tempRob.nextVertex) {
+	//
+	//					System.out.println("Sending the Robot to Fruit ---> ");	
+	//					tempRob.nextVertex = tempRob.getDest().getKey();
+	//					game.chooseNextEdge(tempRob.getId(), tempRob.getDest().getKey());
+	//					game.move();
+	//					tempRob.moving = true;
+	//					moving_counter++;
+	//				}
+	//			}
+	//		}
+	//	}
 
 
 	/**
@@ -531,7 +542,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		}
 	}
 
-	
+
 	static int runner =0;
 	/**
 	 * This function purpose is to update the robots locations.
@@ -540,7 +551,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	 */
 	static int tyyt = 0;
 	public void UpdateRobots(game_service game) {
-		
+
 		runner++;
 		//System.out.println("RRRRRRRRUNERRRRRRRR "+runner);
 		try {
@@ -573,7 +584,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 						r.setPos(Point);
 						r.setSpeed(Speed);
 						r.setValue(value);
-						
+
 						if(Auto) {
 							if(r.firtTime == 0) 
 							{
@@ -586,28 +597,28 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 								MoveAutoGameSmart(this.game);
 							}
 							if(r.moving ) 
-								
+
 							{
-								if(runner % 5 == 0)game.move();
+								if(runner % 8 == 0)game.move();
 								if(src == r.getSrcId()) {
 									r.moving = false;
 									//r.setSrc(DG.NodeMap.get(src));
 									MoveAutoGameSmart(this.game);
 								}
 							}
-//								if (r.getF()!=null) {
-//		
-//									if (findFruitEdge(r.getF()) == DG.getEdge(r.getSrcId(), r.getDest().getKey())){
-//										MoveAutoGameSmart(this.game);
-//										game.move();
-//									}
-//									else {
-//										r.moving = false;
-//										//game.move();
-//										MoveAutoGameSmart(this.game);
-//									}
-//								}
-							
+							//								if (r.getF()!=null) {
+							//		
+							//									if (findFruitEdge(r.getF()) == DG.getEdge(r.getSrcId(), r.getDest().getKey())){
+							//										MoveAutoGameSmart(this.game);
+							//										game.move();
+							//									}
+							//									else {
+							//										r.moving = false;
+							//										//game.move();
+							//										MoveAutoGameSmart(this.game);
+							//									}
+							//								}
+
 						}
 						break;
 					}	
@@ -676,21 +687,16 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		for (Robot tempRobot : RobotsList ) {
 
 			for (Fruit tempFruit : FL) {
-				
+
 				Time = a.shortestPathDist(tempRobot.getSrc().getKey(),tempFruit.getDest());
-				System.out.println("a.shortestPathDist tempRobot.getSrc().getKey() : "+tempRobot.getSrc().getKey() );
-				System.out.println("a.shortestPathDist tempFruit.getDest() : "+tempFruit.getDest() );
-				System.out.println("Time : "+Time);
 				Time =Time/tempRobot.getSpeed();
-				System.out.println("clculating shortestPathDist");
-				
+
 				if ( Time < QuickestTime) {
 					QuickestTime = Time;
-					System.out.println("QuickestTime : "+QuickestTime);
+
 					tempRobot.Thrill = a.shortestPath(tempRobot.getSrcId(), tempFruit.getDest());
 					if(tempRobot.getF() != null) {
-						System.out.println("tempRobot.getF() != null ? true");
-						
+
 						if(tempFruit != tempRobot.getF()) {
 							tempRobot.getF().setR(null);
 							tempRobot.setF(tempFruit);
@@ -698,7 +704,6 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 						}
 					}
 					else {
-						System.out.println("tempRobot.getF() != null ? false");
 						tempRobot.setF(tempFruit);
 						tempFruit.setR(tempRobot);
 					}
@@ -838,8 +843,8 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 			scenario_num = Integer.parseInt(user_input) ;
 		}
 		numOfScenerio = scenario_num;
-		game_service game = Game_Server.getServer(scenario_num); // you have [0,23] games
-		this.game=game;
+		Game_Server.login(312363641);
+		game = Game_Server.getServer(scenario_num); // you have [0,23] games
 		String g = game.getGraph();
 		DGraph gg = new DGraph();
 		gg.init(g);
@@ -1242,12 +1247,13 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	 * responsible to decide if the game is auto or manual
 	 * and keep refreshing the GUI.
 	 */
-	static int runn = 0;
 	@Override
 	public void run() {
 
 		int Manualdt = 70;
-		int Autodt = 10;
+		//double Autodt = 15.3;
+
+
 		if(this.game!=null){
 
 			int answer = JOptionPane.showConfirmDialog(null, "Do you want to creat a KML file??");
@@ -1264,7 +1270,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 						if(!PaintFruits)FruitInit(this.game);
 						if(!PaintRobots)UpdateRobots(this.game);
 						repaint();
-						Thread.sleep(Autodt);
+						Thread.sleep((long) 15.2);
 					}
 					catch (InterruptedException e) {e.printStackTrace();}
 				}
@@ -1280,21 +1286,46 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 					}
 				}
 			}
+			System.out.println(game.toString());
 			if(IsKMLWorking)
 			{	
-				try{KML.close_KML(file_name_KML);}
+				try
+				{String GameKML = KML.close_KML(file_name_KML);
+				game.sendKML(GameKML);
+				}
 				catch (IOException e) {e.printStackTrace();}
 			}
-			System.out.println(game.toString());
+
+			String results = game.toString();
+			JSONObject obj;
+			try {
+				obj = new JSONObject(results);
+				JSONObject CurrBot = (JSONObject) obj.get("GameServer");
+				int score = CurrBot.getInt("grade");
+				JOptionPane.showMessageDialog(null, "GameOver, Final Score is: "+score);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+
+			DB_Reader data_reader = new DB_Reader();
+			JOptionPane.showMessageDialog(null,data_reader.PrintDataFromServer(204593222));
+			//	        if(DB_Reader.allUsers(numOfScenerio)){
+			//	            JOptionPane.showMessageDialog(null,data_reader.UsersAttempts(312363641));
+			//	        }
 		}
+
 	}
 
 	/** Returns an ImageIcon, or null if the path was invalid. */
 	protected ImageIcon createImageIcon(String path, String description) {
+
 		java.net.URL imgURL = getClass().getResource(path);
-		if (imgURL != null) {
+		if (imgURL != null) 
+		{
 			return new ImageIcon(imgURL, description);
-		} else {
+		} 
+		else 
+		{
 			System.err.println("Couldn't find file: " + path);
 			return null;
 		}
@@ -1304,16 +1335,16 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 
 	public void UpdateRobotsManual(game_service game) {
 
-		if(!RobotsList.isEmpty()){
-			RobotsList.clear();
-		}
-		try {
+		if(!RobotsList.isEmpty())RobotsList.clear();
+		try 
+		{
 			List<String> tempRobots = new ArrayList<String>(); 
 			tempRobots = game.getRobots();
 			for(String s: tempRobots){
 				Robot r = new Robot();
 				r.RobotFromJSON(s);
 				RobotsList.add(r);
+
 
 				if(IsKMLWorking)
 				{
