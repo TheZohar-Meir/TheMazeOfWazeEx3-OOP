@@ -434,7 +434,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 		this.GA = new Graph_Algo(GG);
 
 		FruitInit(this.game);
-		RobotInitAuto(this.game);
+		RobotInit(this.game);
 		initGUI(this.DG);
 		ourT.start();
 	}
@@ -599,7 +599,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 							if(r.moving ) 
 
 							{
-								if(runner % 8 == 0)game.move();
+								if(runner % 10 == 0)game.move();
 								if(src == r.getSrcId()) {
 									r.moving = false;
 									//r.setSrc(DG.NodeMap.get(src));
@@ -1251,7 +1251,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 	public void run() {
 
 		int Manualdt = 70;
-		//double Autodt = 15.3;
+		double Autodt = 11.5;
 
 
 		if(this.game!=null){
@@ -1270,7 +1270,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 						if(!PaintFruits)FruitInit(this.game);
 						if(!PaintRobots)UpdateRobots(this.game);
 						repaint();
-						Thread.sleep((long) 15.2);
+						Thread.sleep((long) Autodt);
 					}
 					catch (InterruptedException e) {e.printStackTrace();}
 				}
@@ -1313,7 +1313,6 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 				JOptionPane.showMessageDialog(null,data_reader.UsersAttempts(312363641));
 			}
 		}
-
 	}
 
 	/** Returns an ImageIcon, or null if the path was invalid. */

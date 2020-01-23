@@ -38,8 +38,8 @@ public class Graph_Algo implements graph_algorithms,Serializable{
 	public Graph_Algo(graph g) {
 		this.ga = g;
 	}
-	
-	
+
+
 	/**
 	 * Default constructor.
 	 * @param g - a graph
@@ -47,8 +47,8 @@ public class Graph_Algo implements graph_algorithms,Serializable{
 	public Graph_Algo() {
 		this.ga = null;
 	}
-	
-	
+
+
 	/**
 	 * This function initializes ga field from a given graph.
 	 * @param g - an input graph.
@@ -78,7 +78,7 @@ public class Graph_Algo implements graph_algorithms,Serializable{
 			ex.printStackTrace();
 		}
 	}
-	
+
 
 
 	/**
@@ -138,7 +138,6 @@ public class Graph_Algo implements graph_algorithms,Serializable{
 					}
 					head.setTag(2);
 					if(Nq.peek().getTag() == 2){
-
 						Nq.poll();
 						visitCounter++;
 					}
@@ -186,20 +185,20 @@ public class Graph_Algo implements graph_algorithms,Serializable{
 	 */
 	public List<node_data> shortestPath(int src, int dest) {
 
-	 if(IsExist(src) && IsExist(dest)){
-		dijkstra(src);
+		if(IsExist(src) && IsExist(dest)){
+			dijkstra(src);
 
-		List<node_data> ans = new ArrayList<node_data>();
-		node_data tempNode = ga.getNode(dest);
+			List<node_data> ans = new ArrayList<node_data>();
+			node_data tempNode = ga.getNode(dest);
 
-		while(tempNode.getKey() != src){
+			while(tempNode.getKey() != src){
 
+				ans.add(tempNode);
+				tempNode = ga.getNode(Integer.parseInt(tempNode.getInfo()));
+			}
 			ans.add(tempNode);
-			tempNode = ga.getNode(Integer.parseInt(tempNode.getInfo()));
-		}
-		ans.add(tempNode);
-		Collections.reverse(ans);
-		return ans;
+			Collections.reverse(ans);
+			return ans;
 		}
 		throw new RuntimeException("Error, there is no src or dest vertix.");
 	}
@@ -220,7 +219,7 @@ public class Graph_Algo implements graph_algorithms,Serializable{
 				throw new RuntimeException("Error, there is no src or dest vertix.");
 			}
 		}
-		
+
 		if(targets_arr.length>1){
 
 			if (!this.isConnected()){
