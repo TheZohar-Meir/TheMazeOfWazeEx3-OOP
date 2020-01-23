@@ -421,7 +421,7 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 
 		numOfScenerio = scenario_num;
 		UpdateSpeed(numOfScenerio);
-		Game_Server.login(204593222);
+		Game_Server.login(312363641);
 		game_service game = Game_Server.getServer(scenario_num); // you have [0,23] games
 		this.game=game;
 		System.out.println(this.game);
@@ -1308,10 +1308,10 @@ public class MyGameGUI extends JFrame implements ActionListener , Serializable, 
 			}
 
 			DB_Reader data_reader = new DB_Reader();
-			JOptionPane.showMessageDialog(null,data_reader.PrintDataFromServer(204593222));
-			//	        if(DB_Reader.allUsers(numOfScenerio)){
-			//	            JOptionPane.showMessageDialog(null,data_reader.UsersAttempts(312363641));
-			//	        }
+			JOptionPane.showMessageDialog(null,data_reader.PrintDataFromServer(312363641));
+			if(DB_Reader.allUsers(numOfScenerio)){
+				JOptionPane.showMessageDialog(null,data_reader.UsersAttempts(312363641));
+			}
 		}
 
 	}

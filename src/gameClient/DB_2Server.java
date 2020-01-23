@@ -100,8 +100,7 @@ class DB_Reader {
 	static String UsersAttempts(int Id_number){
 
 		StringBuilder str = new StringBuilder();
-		str.append("Number of attempts by players to passe each stage of the game\r\n" + 
-				":").append("\n");
+		str.append("Number of attempts by players to passe each stage of the game:").append("\n");
 		
 		try {
 			
